@@ -1,0 +1,28 @@
+ORDEN DE LOS ARCHIVOS
+gestion/
+│
+├── templates/
+│   └── gestion/
+│       ├── base.html        <-- Plantilla principal (navbar, footer, Bootstrap CDN)
+│       └── index.html       <-- Página de inicio (hereda de base.html)
+|
+└── static/
+    └── gestion/
+        ├── css/
+        │   └── styles.css   <-- Tus reglas de estilo personalizadas (colores, padding, etc.)
+        │
+        └── js/
+            └── main.js      <-- Tus scripts interactivos (validaciones, alertas, modales)
+
+FUNCIONAMIENTO:
+DIPRE-GDP/
+├── manage.py              <-- El comando maestro para todo
+├── config/
+│   ├── settings.py        <-- Aquí configuras MySQL
+│   ├── urls.py            <-- Rutas principales
+│   └── wsgi.py
+└── DIPRE/
+    ├── models.py          <-- AQUÍ defines tus tablas en código Python
+    ├── views.py           <-- Lógica para responder a las vistas/rutas
+    ├── admin.py           <-- Panel de administración que viene listo
+    └── migrations/        <-- ¡AQUÍ se crea el SQL automáticamente!
