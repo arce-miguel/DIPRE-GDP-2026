@@ -8,7 +8,7 @@ DIPRE-GDP/
 │   ├── settings.py        <-- Aquí configuras MySQL
 │   ├── urls.py            <-- Rutas principales
 │   └── wsgi.py
-└──"GESTION"/
+└── project/
     ├── models.py          <-- AQUÍ defines tus tablas en código Python
     ├── views.py           <-- Lógica para responder a las vistas/rutas
     ├── admin.py           <-- Panel de administración que viene listo
