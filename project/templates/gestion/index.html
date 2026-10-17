@@ -1,15 +1,44 @@
 {% extends 'gestion/base.html' %}
 
-{% block title %}Inicio - Sistema de Préstamos{% endblock %}
+{% block title %}Selección de Módulo - Sistema{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
-    <div class="container-fluid py-3">
-        <h1 class="display-6 fw-bold">Sistema de Control de Préstamos</h1>
-        <p class="col-md-8 fs-5 text-muted">
-            Estructura base inicial lista. Conexión con MySQL y entorno de pruebas configurado.
-        </p>
-        <button id="btnPrueba" class="btn btn-primary btn-lg">Probar JS</button>
+<div class="index-wrapper">
+    <div class="index-container">
+        
+        <!-- Espacio Estudiantes -->
+        <div class="card estudent">
+            <div>                
+                <a href="{% url 'login' %}?tipo=estudiante" class="card-link-wrapper">
+                    <div class="card-icon">👥</div>
+                    <h3>Iniciar sesion como Estudiante</h3>
+                    <p>Módulo de consultas y servicios para los estudiantes</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Espacio Encargado -->
+        <div class="card encargado">
+            <div>
+                <a href="{% url 'login' %}?tipo=encargado" class="card-link-wrapper">
+                    <div class="card-icon">👥</div>
+                    <h3>Iniciar sesion como Encargado</h3>
+                    <p>Módulo de consultas y servicios para los estudiantes</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Espacio Administrador -->
+        <div class="card administra">
+            <div>
+                <a href="{% url 'login' %}?tipo=ADMIN" class="card-link-wrapper">
+                    <div class="card-icon">👥</div>
+                    <h3>Iniciar sesion como Administrador</h3>
+                    <p>Módulo de consultas y servicios para los estudiantes</p>
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

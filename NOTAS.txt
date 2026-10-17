@@ -9,7 +9,7 @@ DIPRE-GDP/
 │   ├── urls.py            <-- Rutas principales
 │   └── wsgi.py
 └──"GESTION"/
-    ├── models.py          <-- AQUÍ defines tus tablas en código Python
+    ├── models.py          <-- AQUÍ defines las tablas de la DB en código Python
     ├── views.py           <-- Lógica para responder a las vistas/rutas
     ├── admin.py           <-- Panel de administración que viene listo
     └── migrations/        <-- ¡AQUÍ se crea el SQL automáticamente!
