@@ -1,32 +1,37 @@
 {% extends 'gestion/base.html' %}
-
+{% load static %}
 {% block title %}{{ titulo_login }}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-0 p-4 rounded-4 bg-white">
-            <div class="mb-3">
-                <a href="{% url 'index' %}" class="text-decoration-none text-muted small">← Volver a selección</a>
-            </div>
-
-            <h2 class="fw-bold text-dark mb-1">{{ titulo_login }}</h2>
-            <p class="text-muted small mb-4">{{ subtitulo }}</p>
-
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label">Usuario / Correo</label>
-                    <input type="text" name="username" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Iniciar Sesión</button>
-            </form>
-            
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-back-box">
+            <a href="{% url 'index' %}" class="login-back-link">← VOLVER A SELECCIÓN</a>
         </div>
+        <div class="login-img-box">
+            <img src="{% static 'gestion/images/Dipre.png' %}" class="login-img">
+        </div>
+        
+        <h2 class="login-title">{{ titulo_login }}</h2>
+        <p class="login-subtitle">{{ subtitulo }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="login-input-group">
+                <label>Número Control</label>
+                <input class="uspas" type="text" id="username" name="username" placeholder="Numero de control" required />
+            </div>
+            
+            <div class="login-input-group">
+                <label>Contraseña</label>
+                <input class="uspas" type="password" id="password" name="password" placeholder="********" required />
+            </div>
+            <div class="login-submit-btn-class">
+                <button type="submit" class="login-submit-btn">Iniciar Sesión</button>
+            </div>
+            
+        </form>
     </div>
 </div>
+
 {% endblock %}

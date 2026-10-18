@@ -11,13 +11,17 @@ html, body {
     display: flex;
     flex-direction: column;
 }
-
+.logo-img{
+    width: 70px;
+    height: auto;
+}
 /* Layout general */
 .navbar-custom {
     background-color: #212529;
     color: #fff;
     padding: 16px;
     text-align: center;
+    align-items: center;
 }
 
 .navbar-brand {
@@ -27,11 +31,13 @@ html, body {
     font-weight: bold;
     display: inline-block;
 }
-
 .main-content {
     flex: 1;
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 
 .footer-custom {
     background-color: #212529;
@@ -123,3 +129,113 @@ html, body {
 
 
 /* PAL LOGIN */
+/* Contenedor general para centrar el módulo de acceso */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+}
+
+/* Tarjeta principal del formulario */
+.login-card {
+    background-color: #ffffff;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+}
+
+/* Enlace de regreso */
+.login-back-box {
+    margin-bottom: 16px;
+}
+.login-img{
+    width: 150px;
+    height: auto;
+}
+.login-back-link {
+    text-decoration: none;
+    color: #6c757d;
+    font-size: 13px;
+    
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.login-back-link:hover {
+    color: #000;
+}
+
+/* Encabezados */
+.login-title {
+    font-weight: 700;
+    color: #212529;
+    font-size: 22px;
+    margin: 0 0 4px 0;
+}
+
+.login-subtitle {
+    color: #6c757d;
+    font-size: 13px;
+    margin: 0 0 24px 0;
+}
+.login-title, .login-subtitle, .login-submit-btn-class, .login-img-box{
+    text-align: center;
+}
+
+/* Grupos de campos de formulario */
+.login-input-group {
+    margin-bottom: 16px;
+}
+
+.login-input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 6px;
+}
+
+.login-input-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: #f8f9fa;
+}
+
+.login-input-group input:focus {
+    outline: none;
+    border-color: #102945; /* Coincide con tu azul institucional */
+    background-color: #ffffff;
+}
+
+/* Botón de acción principal */
+.login-submit-btn {
+    width: 60%;
+    height: 40px;
+    padding: 12px;
+    background-color: #102945;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-top: 8px;
+}
+
+.login-submit-btn:hover {
+    background-color: #0b1d35;
+    transform: scale(1.05);
+}
+.uspas:focus {
+    outline: none;          
+    border: 2px solid #e35b29;  
+}
+
