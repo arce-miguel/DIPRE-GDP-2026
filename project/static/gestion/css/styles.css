@@ -12,14 +12,14 @@ html, body {
     flex-direction: column;
 }
 .logo-img{
-    width: 70px;
+    width: 60px;
     height: auto;
 }
 /* Layout general */
 .navbar-custom {
-    background-color: #212529;
+    background-color: #0c1f34;
     color: #fff;
-    padding: 16px;
+    padding: 15px 15px;
     text-align: center;
     align-items: center;
 }
@@ -36,11 +36,12 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
 }
 
 
 .footer-custom {
-    background-color: #212529;
+    background-color: #0c1f34;
     color: #fff;
     text-align: center;
     padding: 16px;
@@ -51,11 +52,19 @@ html, body {
 .footer-custom p {
     color: #adb5bd;
 }
+header {
+    border-bottom: 2px solid #2196F3;
+    height: 90px;
+}
+
+footer {
+    border-top: 2px solid #2196f3;
+}
 
 /*Index */
 .index-wrapper {
     background-color: #102945;
-    padding: 24px 16px;
+    padding: 24px 20px;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -72,7 +81,7 @@ html, body {
 
 .card {
     border-radius: 16px;
-    padding: 32px;
+   
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -81,6 +90,7 @@ html, body {
 .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 16px rgba(33, 149, 243, 0.349);
 }
 
 .card-icon {
@@ -102,9 +112,10 @@ html, body {
     text-decoration: none;
     color: inherit;
     display: block;
+    padding: 32px;
 }
 .estudent {
-    background-color: #cecece;
+    background-color: #ffffff;
     color: #212529;
 }
 
@@ -129,20 +140,17 @@ html, body {
 
 
 /* PAL LOGIN */
-/* Contenedor general para centrar el módulo de acceso */
 .login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 40px;
     width: 100%;
 }
-
-/* Tarjeta principal del formulario */
 .login-card {
     background-color: #ffffff;
     padding: 32px;
-    border-radius: 16px;
+    border-radius: 40px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     width: 100%;
     max-width: 440px;
@@ -169,7 +177,6 @@ html, body {
     color: #000;
 }
 
-/* Encabezados */
 .login-title {
     font-weight: 700;
     color: #212529;
@@ -186,7 +193,7 @@ html, body {
     text-align: center;
 }
 
-/* Grupos de campos de formulario */
+
 .login-input-group {
     margin-bottom: 16px;
 }
@@ -211,16 +218,16 @@ html, body {
 
 .login-input-group input:focus {
     outline: none;
-    border-color: #102945; /* Coincide con tu azul institucional */
+    border-color: #102945;
     background-color: #ffffff;
 }
 
-/* Botón de acción principal */
+/* Botón*/
 .login-submit-btn {
     width: 60%;
     height: 40px;
     padding: 12px;
-    background-color: #102945;
+    background-color: #00a8cc;
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -228,14 +235,161 @@ html, body {
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
     margin-top: 8px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .login-submit-btn:hover {
-    background-color: #0b1d35;
-    transform: scale(1.05);
+    background-color: #025e83;
+    box-shadow: 0 6px 16px rgb(0, 54, 75);
 }
 .uspas:focus {
     outline: none;          
     border: 2px solid #e35b29;  
 }
 
+/*dashboard del encargado*/
+.ED-wrapper {
+    display: flex; 
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+.ED-wrapper p{
+    font-size: auto ;
+}
+.ED-wrapper-L{
+    display: flex; 
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+
+}
+.ED-logo{
+    height: 50px;
+    width: auto;
+    display: block;
+}
+.ED-wrapper-L svg {
+    width: 24px;
+    height: 24px;
+}
+
+.btn_logout {
+    background-color: #00a8cc;
+    color: #ffffff;
+    font-weight: 300;
+    width: 50px;
+    height: 50px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: background-color 0.15s ease-in-out;
+}
+
+.btn_logout:hover {
+    background-color: #025e83;
+}
+
+.ED-aside{
+    cursor: pointer;
+}
+/*ESte es el button para mostrar el aside*/
+.btn_menu{
+    color: #fff;
+    text-decoration: none;
+}
+.btn_menu:visited {
+    color: black;
+}
+.btn_menu:hover {
+    color: #fff; 
+    transform: scale(1.05);
+}
+/*ESTE ES EL ASIDE Y FUNCIONES*/
+/*REvisar y eliminar y corregir*/
+.main_dis{
+    display: flex;
+    min-height: 90vh;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    flex-direction: row;
+    width: 100%;
+}
+aside{
+    background-color: #c1c1c2;
+    margin: 0%;
+    height: 100%;
+    width: 150px;
+    overflow: hidden;
+    text-align: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    
+}
+/* hr=barra que divide esa madre*/
+hr {
+    border: none;
+    height: 2px;
+    background-color: #9ca3af;
+    margin: 16px auto;
+    width: 85%;
+}
+.aside_img{
+    width: 80px;
+    height: auto;
+    box-sizing: border-box;
+    padding-bottom: 0%;
+    padding-top: 20px;
+}
+
+aside nav a {
+    display: block;
+    width: 85%;
+    margin: 0 auto;
+    text-align: left;
+}
+
+/*hasta aqui*/
+
+/*parte del js*/
+#menu-lateral {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+#menu-lateral.closed {
+    margin-left: -200px; 
+}
+
+/*menú prinicpal del encargado*/
+.ED-principal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 95%;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+.prueba00 {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;             /* Hace que las tres cajas crezcan y se repartan el espacio equitativamente */
+    height: 90%;       /* Altura de prueba para tus cajas */
+    background-color: #000;
+    color: #fff;
+}
+
+.otraprueba{
+    background-color: #00a8cc;
+    width: 100%;
+    flex: 1;
+}
+/* pruebas*/

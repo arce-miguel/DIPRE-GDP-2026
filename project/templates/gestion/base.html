@@ -9,16 +9,20 @@
     <link rel="icon" href="{% static 'gestion/images/icon.ico' %}" type="image/x-icon">
 </head>
 <body>
-    <nav class="navbar-custom" href="{% url 'index'} %">
+    <header class="navbar-custom" href="{% url 'index'} %">
         <div>
+            {% block header_img%}
             <img src="{% static 'gestion/images/LogoDipre.png' %}" alt="LOGO" class="logo-img">
+            {% endblock %}
         </div>
-    </nav>
+    </header>
 
-    <main class="main-content">
+    
         {% block content %}
+<main class="main-content">
+</main>
         {% endblock %}
-    </main>
+    
 
     <footer class="footer-custom">
         <div>
@@ -26,5 +30,7 @@
             <p>&copy; 2026 - Derechos reservados DIPRE asociados y Jose</p>
         </div>
     </footer>
+    {% block extra_js %}
+    {% endblock extra_js %}
 </body>
 </html>

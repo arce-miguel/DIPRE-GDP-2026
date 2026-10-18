@@ -1,0 +1,58 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+{% block title %}{{ titulo_login }}{% endblock %}
+
+{% block header_img %}
+<div class="ED-wrapper">
+    <div class="ED-wrapper-L">
+        <a id="btn-menu" class="btn_menu">
+            <svg class="ED-aside" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </a>
+        <img src="{% static 'gestion/images/DipreSF.png' %}" alt="LOGO" class="ED-logo">  
+    </div>
+    <div class="ED-wrapper-L">
+        <p>Bienvenido Encargado</p>        
+        <!-- <form method="post"> -->
+        <form method="get" action="{% url 'index' %}"> 
+            <button class="btn_logout" type="submit">
+                
+            </button>
+        </form>
+        <!-- </form> -->
+    </div>
+</div>
+{% endblock header_img %}
+
+{% block content %}
+<main class="main_dis">
+    <aside id="menu-lateral" class="closed">
+        <br>
+        <nav>
+            <p>Inicio</p>
+            <hr>
+            <a>Nuevo Ticket</a>
+            <a>Mis Tickets</a>
+            <hr>
+        </nav>
+    </aside>
+    <section class="ED-principal">
+        <section class="prueba00">
+            <div class="otroprueba">
+                pruebaotro1
+            </div>
+            <div class="otroprueba">
+                sadads
+            </div>
+        </section>
+        <section class="prueba00">prueba2</section>
+        <section class="prueba00">prueba3</section>
+    </section>
+</main>
+{% endblock %}
+
+<!-- Aquí es donde vinculas tu archivo main.js externo -->
+{% block extra_js %}
+<script src="{% static 'gestion/js/main.js' %}"></script>
+{% endblock %}

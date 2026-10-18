@@ -9,7 +9,7 @@ def login_todos(request):
     
     if tipo == 'encargado':
         titulo_login = "ENCARGADO"
-        subtitulo = "Ingrese con su cuenta y clave institucional docente"
+        subtitulo = "Ingrese datos de encargado"
     elif tipo == 'ADMIN':
         titulo_login = "ADMINISTRADOR"
         subtitulo = "Ingrese datos de administrador"
@@ -22,3 +22,5 @@ def login_todos(request):
         'subtitulo': subtitulo,
         'tipo': tipo
     })
+def enc_dash(request):
+    return render(request, 'gestion/encargado/encargado-dashboard.html')
