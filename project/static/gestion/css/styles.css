@@ -223,7 +223,7 @@ footer {
 }
 
 /* Botón*/
-.login-submit-btn {
+.login-submit-btn, .ED-subm-btn-r {
     width: 60%;
     height: 40px;
     padding: 12px;
@@ -238,7 +238,7 @@ footer {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.login-submit-btn:hover {
+.login-submit-btn:hover{
     background-color: #025e83;
     box-shadow: 0 6px 16px rgb(0, 54, 75);
 }
@@ -308,8 +308,7 @@ footer {
     color: #fff; 
     transform: scale(1.05);
 }
-/*ESTE ES EL ASIDE Y FUNCIONES*/
-/*REvisar y eliminar y corregir*/
+/*aside*/
 .main_dis{
     display: flex;
     min-height: 90vh;
@@ -323,21 +322,15 @@ aside{
     background-color: #c1c1c2;
     margin: 0%;
     height: 100%;
-    width: 150px;
+    width: 170px;
     overflow: hidden;
     text-align: center;
     font-weight: bold;
     flex-shrink: 0;
+    border-right: 2px solid #2196F3;
     
 }
-/* hr=barra que divide esa madre*/
-hr {
-    border: none;
-    height: 2px;
-    background-color: #9ca3af;
-    margin: 16px auto;
-    width: 85%;
-}
+
 .aside_img{
     width: 80px;
     height: auto;
@@ -345,15 +338,30 @@ hr {
     padding-bottom: 0%;
     padding-top: 20px;
 }
-
-aside nav a {
-    display: block;
-    width: 85%;
+.aside-nav{
+    display: flex;
+    flex-direction: column;
+    width: 90%;
     margin: 0 auto;
     text-align: left;
+    gap: 8px;
+    padding-top: 15px;
 }
-
-/*hasta aqui*/
+.aside-nav a {
+    display: block;
+    text-decoration: none;
+    color: #102945;
+    text-align: left;
+    padding: 10px 14px 10px 18px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    font-size: large;    
+    font-weight: 500;
+}
+.aside-nav a:hover {
+    background-color: #d1d5db;
+    color: #0f172a;
+}
 
 /*parte del js*/
 #menu-lateral {
@@ -366,6 +374,7 @@ aside nav a {
 
 /*menú prinicpal del encargado*/
 .ED-principal {
+    /*toda eso es para los elmentos hijos*/
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -374,22 +383,45 @@ aside nav a {
     max-width: 1200px;
     margin: 0 auto;
     gap: 20px;
+    /*hasta aqui*/
 }
 
-.prueba00 {
+.ED-menus {
     display: flex; 
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    flex: 1;             /* Hace que las tres cajas crezcan y se repartan el espacio equitativamente */
-    height: 90%;       /* Altura de prueba para tus cajas */
-    background-color: #000;
+    justify-content: center;
+    flex: 1;
+    height: 90%;
+    
     color: #fff;
+    gap: 20px;
+    box-sizing: border-box;
 }
 
-.otraprueba{
-    background-color: #00a8cc;
-    width: 100%;
-    flex: 1;
+.ED-subm, .ED-subm-complete{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    /* internas */
+    background-color: #fff;
+    height: 50%;
+    width: 100%;    
+    border-radius: 16px;
+    text-align: center;
+    color: #000;
 }
-/* pruebas*/
+.ED-subm-complete{
+    height: 100%;
+}
+/* submenu 5*/
+.ED-subm-btn-r:hover {
+    background-color: #025e83;
+    box-shadow: 0 6px 16px rgb(0, 54, 75);
+}
+.ED-subm-btn-r {
+    font-size:large;
+}
+

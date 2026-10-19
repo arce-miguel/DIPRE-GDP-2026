@@ -28,31 +28,48 @@
 {% block content %}
 <main class="main_dis">
     <aside id="menu-lateral" class="closed">
-        <br>
-        <nav>
-            <p>Inicio</p>
-            <hr>
-            <a>Nuevo Ticket</a>
-            <a>Mis Tickets</a>
+        <nav class="aside-nav">
+            <a>Principal</a>
+            <a>Prestamos</a>
+            <a>Devoluciones</a>
+            <a>Incidentes</a>
+            <a>Vencidos</a>
+            <a>Inventario</a>
+            <a>Adeudos</a>
+            <a>Historial</a>
             <hr>
         </nav>
     </aside>
     <section class="ED-principal">
-        <section class="prueba00">
-            <div class="otroprueba">
-                pruebaotro1
+        <section class="ED-menus">
+            <div class="ED-subm">
+                <h2>CONTEOS</h2>
             </div>
-            <div class="otroprueba">
-                sadads
+            <div class="ED-subm">
+                <h2>VENCIDOS</h2>
             </div>
         </section>
-        <section class="prueba00">prueba2</section>
-        <section class="prueba00">prueba3</section>
+        <section class="ED-menus">
+            <div class="ED-subm-complete">
+                <h2>LISTADO DE EQUIPO DISPONIBLE</h2>
+            </div>
+        </section>
+        <section class="ED-menus">
+            <div class="ED-subm">
+                <h2>ACCIONES RÁPIDAS</h2>
+                <button type="submit" class="ED-subm-btn-r">Nuevo Prestamo</button>
+                <button type="submit" class="ED-subm-btn-r">Nueva Devolucion</button>
+                <button type="submit" class="ED-subm-btn-r">Otra Accion que no se cual</button>
+            </div>
+            <div class="ED-subm">
+                <h2>ACTIVIDAD RECIENTE</h2>
+            </div>
+        </section>
     </section>
 </main>
 {% endblock %}
 
-<!-- Aquí es donde vinculas tu archivo main.js externo -->
+
 {% block extra_js %}
 <script src="{% static 'gestion/js/main.js' %}"></script>
 {% endblock %}
