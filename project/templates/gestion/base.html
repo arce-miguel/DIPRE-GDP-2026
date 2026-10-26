@@ -9,6 +9,7 @@
     <link rel="icon" href="{% static 'gestion/images/icon.ico' %}" type="image/x-icon">
 </head>
 <body>
+    {% include 'gestion/svg_sprites.html' %}
     <header class="navbar-custom" href="{% url 'index'} %">
         <div>
             {% block header_img%}

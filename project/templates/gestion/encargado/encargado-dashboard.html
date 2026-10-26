@@ -14,13 +14,6 @@
     </div>
     <div class="ED-wrapper-L">
         <p>Bienvenido Encargado</p>        
-        <!-- <form method="post"> -->
-        <form method="get" action="{% url 'index' %}"> 
-            <button class="btn_logout" type="submit">
-                
-            </button>
-        </form>
-        <!-- </form> -->
     </div>
 </div>
 {% endblock header_img %}
@@ -29,40 +22,185 @@
 <main class="main_dis">
     <aside id="menu-lateral" class="closed">
         <nav class="aside-nav">
-            <a>Principal</a>
-            <a>Prestamos</a>
-            <a>Devoluciones</a>
-            <a>Incidentes</a>
-            <a>Vencidos</a>
-            <a>Inventario</a>
-            <a>Adeudos</a>
-            <a>Historial</a>
+            <a class="aside-nav-select">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#principal"></use>
+                </svg>
+                <span>Principal</span>
+            </a>
+            <a class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#prestamos"></use>
+                </svg>
+                <span>Prestamos</span>
+            </a>
+            <a class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#devoluciones"></use>
+                </svg>
+                <span>Devoluciones</span>
+            </a>
+            <a class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#incidentes"></use>
+                </svg>
+                <span>Incidentes</span>
+            </a>
+            <a class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#vencidos"></use>
+                </svg>
+                <span> Vencidos </span>
+            </a>
+            <a class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#inventario"></use>
+                </svg>
+                <span>Inventario</span>
+            </a>
+            <a class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#adeudos"></use>
+                </svg>
+                <span>Adeudos</span>
+            </a>
+            <a class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#historial"></use>
+                </svg>
+                <span>Historial</span>
+            </a>
             <hr>
+            <a href="{% url 'index' %}" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#logout"></use>
+                </svg>
+                <span>Cerrar Sesión</span>
+            </a>
         </nav>
     </aside>
     <section class="ED-principal">
         <section class="ED-menus">
-            <div class="ED-subm">
-                <h2>CONTEOS</h2>
+                        <div class="ED-subm">
+                <div class="titulo">
+                    <svg class="icons"><use href="#conteos"></use></svg>
+                    <h2>CONTEOS</h2>
+                </div> 
+                <div class="medio">
+                    <div class="columna">
+                        <b>Prestamos:</b>
+                    </div>
+                    <span>2</span>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Incidentes:</b>
+                    </div>
+                    <span>10</span>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Pendientes:</b>
+                    </div>
+                    <span>9</span>
+                </div>
             </div>
             <div class="ED-subm">
-                <h2>VENCIDOS</h2>
+                <div class="titulo">
+                    <svg class="icons"><use href="#vencidos"></use></svg>
+                    <h2>VENCIDOS</h2>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Diana M.</b>
+                        <small>El corazon de mi compa</small>
+                    </div>
+                    <span class="badge nook">8 días</span>
+                </div>
             </div>
         </section>
+
         <section class="ED-menus">
             <div class="ED-subm-complete">
-                <h2>LISTADO DE EQUIPO DISPONIBLE</h2>
+                <div class="titulo">
+                    <svg class="icons"><use href="#equipo"></use></svg>
+                    <h2>EQUIPO DISPONIBLE</h2>
+                </div>
+                <div class="search">
+                    <svg class="icons"><use href="#buscar"></use></svg>
+                    <input type="text" placeholder="Buscar equipo o código" autocomplete="off">
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Laptop Dell Latitude</b>
+                        <small>LAP-014</small>
+                    </div>
+                    <span class="badge ok">Disponible</span>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Laptop Dell Latitude</b>
+                        <small>LAP-014</small>
+                    </div>
+                    <span class="badge ok">Disponible</span>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Laptop Dell Latitude</b>
+                        <small>LAP-014</small>
+                    </div>
+                    <span class="badge ok">Disponible</span>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Laptop Dell Latitude</b>
+                        <small>LAP-014</small>
+                    </div>
+                    <span class="badge ok">Disponible</span>
+                </div>
             </div>
         </section>
+
+
         <section class="ED-menus">
             <div class="ED-subm">
-                <h2>ACCIONES RÁPIDAS</h2>
-                <button type="submit" class="ED-subm-btn-r">Nuevo Prestamo</button>
-                <button type="submit" class="ED-subm-btn-r">Nueva Devolucion</button>
-                <button type="submit" class="ED-subm-btn-r">Otra Accion que no se cual</button>
+                <div class="titulo">
+                    <svg class="icons"><use href="#rapidas"></use></svg>
+                    <h2>ACCIONES RÁPIDAS</h2>
+                </div> 
+                <button type="submit" class="ED-subm-btn-r">
+                    <svg class="icons"><use href="#prestamos2"></use></svg>Nuevo Prestamo
+                </button>
+                <button type="submit" class="ED-subm-btn-r">
+                    <svg class="icons"><use href="#devoluciones2"></use></svg>Nueva Devolucion
+                </button>
+                <button type="submit" class="ED-subm-btn-r">
+                    <svg class="icons"><use href="#incidentes2"></use></svg>registra Incidente
+                </button>
             </div>
             <div class="ED-subm">
-                <h2>ACTIVIDAD RECIENTE</h2>
+                <div class="titulo">
+                    <svg class="icons"><use href="#historial"></use></svg>
+                    <h2>ACTIVIDAD RECIENTE</h2>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Prestamo registrado  </b>
+                        <small>Laptop Dell · LAP-014 - hace 10 min</small>
+                    </div>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Prestamo registrado  </b>
+                        <small>Laptop Dell · LAP-014 - hace 10 min</small>
+                    </div>
+                </div>
+                <div class="medio">
+                    <div class="columna">
+                        <b>Prestamo registrado  </b>
+                        <small>Laptop Dell · LAP-014 - hace 10 min</small>
+                    </div>
+                </div>
             </div>
         </section>
     </section>
