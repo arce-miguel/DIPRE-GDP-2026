@@ -69,6 +69,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# Usuario personalizado (project.models.Usuario); debe definirse antes del primer migrate
+AUTH_USER_MODEL = 'project.Usuario'
+
+# Minutos de tolerancia después de la fecha límite antes de marcar un préstamo como vencido
+TOLERANCIA_MINUTOS = 10
+
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
