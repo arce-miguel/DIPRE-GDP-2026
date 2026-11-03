@@ -355,3 +355,39 @@ html, body {
     .fila-nota td { display: block; }
     .fila-nota td::before { content: none; }
 }
+
+
+/* Formulario de solicitud */
+.form-solicitud { display: flex; flex-direction: column; gap: 16px; }
+.form-solicitud fieldset { border: 0; }
+.form-solicitud legend { font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+.grupo-titulo { margin: 12px 0 6px; }
+.grupo-titulo small { color: #6c757d; font-weight: 400; }
+.equipos-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+
+.equipo-opcion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.equipo-opcion:has(input:checked) { border-color: #0d6efd; background-color: #e7f0ff; }
+.equipo-opcion small { color: #6c757d; display: block; }
+.campo { display: flex; flex-direction: column; gap: 4px; }
+.campo label { font-weight: 600; }
+
+.campo input,
+.campo select,
+.campo textarea {
+    padding: 8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font: inherit;
+}
+
+.campo-error { color: #842029; font-size: 14px; }
+.form-solicitud .btn-primary { border: 0; cursor: pointer; align-self: flex-start; font: inherit; font-weight: 600; }

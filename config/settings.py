@@ -75,6 +75,11 @@ AUTH_USER_MODEL = 'project.Usuario'
 # Minutos de tolerancia después de la fecha límite antes de marcar un préstamo como vencido
 TOLERANCIA_MINUTOS = 10
 
+# Reglas de las solicitudes de préstamo
+SOLICITUD_MAX_EQUIPOS = 3  # equipos por solicitud
+SOLICITUD_MAX_DIAS = 7  # días máximos de préstamo (categorías por días)
+HORARIO_SERVICIO = (8, 18)  # hora de apertura y cierre (categorías por horas)
+
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases

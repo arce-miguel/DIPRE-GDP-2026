@@ -1,7 +1,10 @@
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .models import Prestamo
+from .forms import SolicitudPrestamoForm
+from .models import Equipo, Prestamo
 
 # Create your views here.
 def index(request):
@@ -54,7 +57,27 @@ def panel_solicitante(request):
 
 @login_required
 def solicitar_equipo(request):
-    # Pendiente: formulario de solicitud de equipo.
-    if request.user.tiene_adeudos:
+    usuario = request.user
+    if not usuario.es_solicitante:
+        return redirect('index')
+    if usuario.tiene_adeudos:
+        messages.error(request, 'Tienes adeudos pendientes y no puedes solicitar equipos.')
         return redirect('panel_solicitante')
-    return render(request, 'gestion/solicitar_equipo.html')
+
+    form = SolicitudPrestamoForm(request.POST or None, solicitante=usuario)
+    if request.method == 'POST' and form.is_valid():
+        form.guardar()
+        messages.success(request, 'Tu solicitud fue enviada. Espera la aprobación del encargado.')
+        return redirect('panel_solicitante')
+
+    disponibles = Equipo.objects.filter(estado=Equipo.DISPONIBLE).select_related('categoria')
+    grupos = {}
+    for equipo in disponibles:
+        grupos.setdefault(equipo.categoria, []).append(equipo)
+    seleccionados = {int(pk) for pk in request.POST.getlist('equipos') if pk.isdigit()}
+    return render(request, 'gestion/solicitar_equipo.html', {
+        'form': form,
+        'grupos': grupos.items(),
+        'seleccionados': seleccionados,
+        'max_equipos': settings.SOLICITUD_MAX_EQUIPOS,
+    })
