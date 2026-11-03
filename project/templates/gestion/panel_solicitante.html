@@ -1,0 +1,87 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Panel del Estudiante - Sistema{% endblock %}
+
+{% block content %}
+<div class="panel-wrapper">
+
+    <header class="panel-header">
+        <div>
+            <h1>Hola, {{ user.nombre }}</h1>
+            <p>{{ user.identificador }}</p>
+        </div>
+        <div class="panel-actions">
+            {% if tiene_adeudos %}
+            <span class="btn-primary btn-disabled" aria-disabled="true">+ Solicitar equipo</span>
+            {% else %}
+            <a href="{% url 'solicitar_equipo' %}" class="btn-primary">+ Solicitar equipo</a>
+            {% endif %}
+        </div>
+    </header>
+
+    {% include 'gestion/_mensajes.html' %}
+
+    {% if tiene_adeudos %}
+    <div class="aviso aviso-error" role="alert">
+        Tienes adeudos pendientes, por lo que no puedes solicitar nuevos equipos hasta regularizarlos.
+        {% if incidencias_pendientes %}
+        <ul>
+            {% for i in incidencias_pendientes %}<li>{{ i.equipo.nombre }}: {{ i.get_tipo_display|lower }}. Se salda reponiendo el equipo o pagando su costo; acude con el encargado.</li>{% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <section class="stats">
+        <div class="stat stat-activo">
+            <span class="stat-num">{{ resumen.activos }}</span>
+            <span class="stat-label">Préstamos activos</span>
+        </div>
+        <div class="stat stat-vencido">
+            <span class="stat-num">{{ resumen.vencidos }}</span>
+            <span class="stat-label">Vencidos</span>
+        </div>
+        <div class="stat stat-pendiente">
+            <span class="stat-num">{{ resumen.pendientes }}</span>
+            <span class="stat-label">Solicitudes pendientes</span>
+        </div>
+    </section>
+
+    <section class="panel-card">
+        <h2>Mis préstamos</h2>
+
+        {% if prestamos %}
+        <div class="table-scroll">
+            <table class="loan-table">
+                <thead>
+                    <tr>
+                        <th>Equipo</th>
+                        <th>Categoría</th>
+                        <th>Solicitado</th>
+                        <th>Fecha límite</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in prestamos %}
+                    <tr>
+                        <td data-label="Equipo">{{ p.resumen_equipos }}</td>
+                        <td data-label="Categoría">{{ p.resumen_categorias }}</td>
+                        <td data-label="Solicitado">{{ p.fecha_solicitud|date:"d/m/Y" }}</td>
+                        <td data-label="Fecha límite">{{ p.fecha_limite|date:"d/m/Y H:i" }}</td>
+                        <td data-label="Estado"><span class="badge badge-{{ p.estado_visible }}">{{ p.estado_visible|capfirst }}</span></td>
+                    </tr>
+                    {% if p.estado == 'rechazado' and p.observaciones %}
+                    <tr class="fila-nota"><td colspan="5">Motivo del rechazo: {{ p.observaciones }}</td></tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty">Aún no tienes préstamos registrados.</p>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

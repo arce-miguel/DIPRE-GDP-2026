@@ -299,6 +299,10 @@ class Prestamo(models.Model):
     def resumen_equipos(self):
         return ', '.join(d.equipo.nombre for d in self.detalles.all())
 
+    @property
+    def resumen_categorias(self):
+        return ', '.join(dict.fromkeys(str(d.equipo.categoria) for d in self.detalles.all()))
+
 
 class DetallePrestamo(models.Model):
     BUEN_ESTADO = 'buen_estado'
