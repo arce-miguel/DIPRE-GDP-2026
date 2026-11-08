@@ -399,3 +399,71 @@ html, body {
 .lista-adeudos { margin: 8px 0 0 20px; display: flex; flex-direction: column; gap: 8px; }
 .lista-adeudos small { color: #6c757d; }
 .loan-table a { color: #0d6efd; }
+
+
+/* Solicitud: pasos, búsqueda y tarjetas */
+.paso h2 { display: flex; align-items: center; gap: 10px; }
+
+.paso-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: #4fd1c5;
+    color: #102945;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.buscador {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font: inherit;
+    margin-bottom: 12px;
+}
+
+.filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+
+.filtro-categoria {
+    padding: 6px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 999px;
+    background: #fff;
+    color: #212529;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filtro-categoria.activo { background-color: #102945; border-color: #102945; color: #fff; }
+
+.equipo-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px;
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.equipo-card[hidden] { display: none; }
+.equipo-card input { position: absolute; opacity: 0; pointer-events: none; }
+.equipo-card:has(input:checked) { border-color: #0d6efd; background-color: #e7f0ff; }
+.equipo-card:has(input:focus-visible) { outline: 2px solid #0d6efd; outline-offset: 2px; }
+.equipo-no-disponible { opacity: 0.55; background-color: #f1f3f5; cursor: not-allowed; }
+.equipo-top { display: flex; justify-content: space-between; font-size: 12px; text-transform: uppercase; }
+.equipo-cat { color: #6c757d; }
+.equipo-estado { font-weight: 600; text-transform: none; }
+.estado-disponible { color: #0f8a5f; }
+.estado-prestado { color: #c4572d; }
+.equipo-nombre { font-size: 16px; }
+.equipo-codigo { color: #6c757d; font-size: 13px; }
+.equipo-regla { color: #0d6efd; font-size: 13px; }
+.form-solicitud .btn-primary:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.7; }

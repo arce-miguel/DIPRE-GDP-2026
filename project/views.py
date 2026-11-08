@@ -60,26 +60,26 @@ def solicitar_equipo(request):
     usuario = request.user
     if not usuario.es_solicitante:
         return redirect('index')
-    if usuario.tiene_adeudos:
-        messages.error(request, 'Tienes adeudos pendientes y no puedes solicitar equipos.')
-        return redirect('panel_solicitante')
 
+    tiene_adeudos = usuario.tiene_adeudos
     form = SolicitudPrestamoForm(request.POST or None, solicitante=usuario)
     if request.method == 'POST' and form.is_valid():
         form.guardar()
         messages.success(request, 'Tu solicitud fue enviada. Espera la aprobación del encargado.')
         return redirect('panel_solicitante')
 
-    disponibles = Equipo.objects.filter(estado=Equipo.DISPONIBLE).select_related('categoria')
-    grupos = {}
-    for equipo in disponibles:
-        grupos.setdefault(equipo.categoria, []).append(equipo)
+    equipos = (Equipo.objects.filter(estado__in=[Equipo.DISPONIBLE, Equipo.PRESTADO])
+               .select_related('categoria'))
     seleccionados = {int(pk) for pk in request.POST.getlist('equipos') if pk.isdigit()}
     return render(request, 'gestion/solicitar_equipo.html', {
         'form': form,
-        'grupos': grupos.items(),
+        'equipos': equipos,
+        'categorias': sorted({e.categoria for e in equipos}, key=lambda c: c.nombre),
         'seleccionados': seleccionados,
+        'tiene_adeudos': tiene_adeudos,
         'max_equipos': settings.SOLICITUD_MAX_EQUIPOS,
+        'max_horas': settings.SOLICITUD_MAX_HORAS,
+        'max_dias': settings.SOLICITUD_MAX_DIAS,
     })
 
 

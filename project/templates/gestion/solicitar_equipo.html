@@ -1,4 +1,5 @@
 {% extends 'gestion/base.html' %}
+{% load static %}
 
 {% block title %}Solicitar equipo - Sistema{% endblock %}
 
@@ -8,58 +9,90 @@
     <header class="panel-header">
         <div>
             <h1>Solicitar equipo</h1>
-            <p>Elige hasta {{ max_equipos }} equipos de una misma modalidad.</p>
+            <p>Elige hasta {{ max_equipos }} equipos disponibles y completa los datos de tu solicitud.</p>
         </div>
-        <a href="{% url 'panel_solicitante' %}" class="btn-primary">Volver al panel</a>
+        <a href="{% url 'panel_solicitante' %}" class="btn-primary">← Volver a mis préstamos</a>
     </header>
 
-    {% if form.non_field_errors %}
+    {% if tiene_adeudos %}
+    <div class="aviso aviso-error" role="alert">
+        Tienes adeudos pendientes; no podrás enviar solicitudes hasta regularizarlos.
+        <a href="{% url 'mis_adeudos' %}">Ver mis adeudos</a>
+    </div>
+    {% endif %}
+
+    {% if form.non_field_errors and not tiene_adeudos %}
     <div class="aviso aviso-error" role="alert">
         {% for e in form.non_field_errors %}{{ e }}{% endfor %}
     </div>
     {% endif %}
 
-    <form method="post" class="panel-card form-solicitud" novalidate>
+    <form method="post" class="form-solicitud" novalidate>
         {% csrf_token %}
 
-        <fieldset>
-            <legend>Equipos disponibles</legend>
-            {% for categoria, equipos in grupos %}
-            <h3 class="grupo-titulo">{{ categoria.nombre }} <small>({{ categoria.get_modalidad_display }})</small></h3>
-            <div class="equipos-lista">
-                {% for e in equipos %}
-                <label class="equipo-opcion">
-                    <input type="checkbox" name="equipos" value="{{ e.pk }}" {% if e.pk in seleccionados %}checked{% endif %}>
-                    <span>{{ e.nombre }} <small>{{ e.codigo_inventario }}</small></span>
-                </label>
+        <section class="panel-card paso">
+            <h2><span class="paso-num">1</span> Elige el equipo</h2>
+
+            <input type="search" id="buscar-equipo" class="buscador" placeholder="Buscar equipo..." aria-label="Buscar equipo">
+
+            <div class="filtros" role="group" aria-label="Filtrar por categoría">
+                <button type="button" class="filtro-categoria activo" data-categoria="todos">Todos</button>
+                {% for c in categorias %}
+                <button type="button" class="filtro-categoria" data-categoria="{{ c.pk }}">{{ c.nombre }}</button>
                 {% endfor %}
             </div>
-            {% empty %}
-            <p class="empty">No hay equipos disponibles por el momento.</p>
-            {% endfor %}
+
+            <div class="equipos-lista">
+                {% for e in equipos %}
+                <label class="equipo-card{% if not e.disponible %} equipo-no-disponible{% endif %}"
+                       data-categoria="{{ e.categoria_id }}"
+                       data-busqueda="{{ e.nombre|lower }} {{ e.codigo_inventario|lower }} {{ e.categoria.nombre|lower }}">
+                    <input type="checkbox" name="equipos" value="{{ e.pk }}"
+                           {% if e.pk in seleccionados %}checked{% endif %}
+                           {% if not e.disponible or tiene_adeudos %}disabled{% endif %}>
+                    <span class="equipo-top">
+                        <span class="equipo-cat">{{ e.categoria.nombre }}</span>
+                        <span class="equipo-estado estado-{{ e.estado }}">{{ e.get_estado_display }}</span>
+                    </span>
+                    <strong class="equipo-nombre">{{ e.nombre }}</strong>
+                    <span class="equipo-codigo">Código {{ e.codigo_inventario }}</span>
+                    <span class="equipo-regla">
+                        {% if e.por_horas %}Por horas · máx. {{ max_horas }} h, mismo día{% else %}Por días · hasta {{ max_dias }} días{% endif %}
+                    </span>
+                </label>
+                {% empty %}
+                <p class="empty">No hay equipos por el momento.</p>
+                {% endfor %}
+            </div>
+            <p id="sin-resultados" class="empty" hidden>Ningún equipo coincide con tu búsqueda.</p>
             {% for e in form.equipos.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
-        </fieldset>
+        </section>
 
-        <div class="campo">
-            <label for="{{ form.fecha_limite.id_for_label }}">{{ form.fecha_limite.label }}</label>
-            {{ form.fecha_limite }}
-            {% for e in form.fecha_limite.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
-        </div>
+        <section class="panel-card paso">
+            <h2><span class="paso-num">2</span> Detalles del préstamo</h2>
 
-        <div class="campo">
-            <label for="{{ form.motivo_tipo.id_for_label }}">{{ form.motivo_tipo.label }}</label>
-            {{ form.motivo_tipo }}
-            {% for e in form.motivo_tipo.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
-        </div>
+            <div class="campo">
+                <label for="{{ form.fecha_limite.id_for_label }}">{{ form.fecha_limite.label }}</label>
+                {{ form.fecha_limite }}
+                {% for e in form.fecha_limite.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
+            </div>
 
-        <div class="campo">
-            <label for="{{ form.motivo.id_for_label }}">{{ form.motivo.label }}</label>
-            {{ form.motivo }}
-            {% for e in form.motivo.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
-        </div>
+            <div class="campo">
+                <label for="{{ form.motivo_tipo.id_for_label }}">{{ form.motivo_tipo.label }}</label>
+                {{ form.motivo_tipo }}
+                {% for e in form.motivo_tipo.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
+            </div>
 
-        <button type="submit" class="btn-primary">Enviar solicitud</button>
+            <div class="campo">
+                <label for="{{ form.motivo.id_for_label }}">{{ form.motivo.label }}</label>
+                {{ form.motivo }}
+                {% for e in form.motivo.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
+            </div>
+
+            <button type="submit" class="btn-primary" {% if tiene_adeudos %}disabled{% endif %}>Enviar solicitud</button>
+        </section>
     </form>
 
 </div>
+<script src="{% static 'gestion/js/solicitar_equipo.js' %}"></script>
 {% endblock %}

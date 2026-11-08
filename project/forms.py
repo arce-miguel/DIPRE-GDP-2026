@@ -56,6 +56,9 @@ class SolicitudPrestamoForm(forms.Form):
                 apertura, cierre = settings.HORARIO_SERVICIO
                 if limite.date() != ahora.date():
                     self.add_error('fecha_limite', 'Los equipos por horas se devuelven el mismo día.')
+                elif limite > ahora + timedelta(hours=settings.SOLICITUD_MAX_HORAS):
+                    self.add_error(
+                        'fecha_limite', f'El préstamo por horas no puede exceder {settings.SOLICITUD_MAX_HORAS} horas.')
                 elif not apertura <= limite.hour < cierre:
                     self.add_error(
                         'fecha_limite', f'Fuera del horario de servicio ({apertura}:00 a {cierre}:00).')
