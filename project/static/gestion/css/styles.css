@@ -391,3 +391,11 @@ html, body {
 
 .campo-error { color: #842029; font-size: 14px; }
 .form-solicitud .btn-primary { border: 0; cursor: pointer; align-self: flex-start; font: inherit; font-weight: 600; }
+
+
+/* Detalle y adeudos */
+.datos { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+.datos dt { font-weight: 600; color: #6c757d; }
+.lista-adeudos { margin: 8px 0 0 20px; display: flex; flex-direction: column; gap: 8px; }
+.lista-adeudos small { color: #6c757d; }
+.loan-table a { color: #0d6efd; }

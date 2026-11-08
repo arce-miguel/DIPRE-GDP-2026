@@ -29,6 +29,7 @@
             {% for i in incidencias_pendientes %}<li>{{ i.equipo.nombre }}: {{ i.get_tipo_display|lower }}. Se salda reponiendo el equipo o pagando su costo; acude con el encargado.</li>{% endfor %}
         </ul>
         {% endif %}
+        <a href="{% url 'mis_adeudos' %}">Ver detalle de mis adeudos</a>
     </div>
     {% endif %}
 
@@ -65,7 +66,7 @@
                 <tbody>
                     {% for p in prestamos %}
                     <tr>
-                        <td data-label="Equipo">{{ p.resumen_equipos }}</td>
+                        <td data-label="Equipo"><a href="{% url 'detalle_prestamo' p.pk %}">{{ p.resumen_equipos }}</a></td>
                         <td data-label="Categoría">{{ p.resumen_categorias }}</td>
                         <td data-label="Solicitado">{{ p.fecha_solicitud|date:"d/m/Y" }}</td>
                         <td data-label="Fecha límite">{{ p.fecha_limite|date:"d/m/Y H:i" }}</td>

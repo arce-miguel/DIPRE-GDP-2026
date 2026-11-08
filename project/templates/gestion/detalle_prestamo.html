@@ -1,0 +1,54 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Préstamo #{{ prestamo.pk }} - Sistema{% endblock %}
+
+{% block content %}
+<div class="panel-wrapper">
+
+    <header class="panel-header">
+        <div>
+            <h1>Préstamo #{{ prestamo.pk }}</h1>
+            <p><span class="badge badge-{{ prestamo.estado_visible }}">{{ prestamo.estado_visible|capfirst }}</span></p>
+        </div>
+        <a href="{% url 'panel_solicitante' %}" class="btn-primary">Volver al panel</a>
+    </header>
+
+    {% if prestamo.estado == 'rechazado' %}
+    <div class="aviso aviso-error" role="alert">
+        Solicitud rechazada{% if prestamo.observaciones %}: {{ prestamo.observaciones }}{% endif %}
+    </div>
+    {% endif %}
+
+    <section class="panel-card">
+        <h2>Datos de la solicitud</h2>
+        <dl class="datos">
+            <dt>Solicitado</dt><dd>{{ prestamo.fecha_solicitud|date:"d/m/Y H:i" }}</dd>
+            <dt>Entregado</dt><dd>{{ prestamo.fecha_entrega|date:"d/m/Y H:i"|default:"Aún no" }}</dd>
+            <dt>Fecha límite</dt><dd>{{ prestamo.fecha_limite|date:"d/m/Y H:i" }}</dd>
+            <dt>Motivo</dt><dd>{{ prestamo.motivo_completo }}</dd>
+        </dl>
+    </section>
+
+    <section class="panel-card">
+        <h2>Equipos</h2>
+        <div class="table-scroll">
+            <table class="loan-table">
+                <thead>
+                    <tr><th>Equipo</th><th>Categoría</th><th>Código</th><th>Devolución</th></tr>
+                </thead>
+                <tbody>
+                    {% for d in prestamo.detalles.all %}
+                    <tr>
+                        <td data-label="Equipo">{{ d.equipo.nombre }}</td>
+                        <td data-label="Categoría">{{ d.equipo.categoria }}</td>
+                        <td data-label="Código">{{ d.equipo.codigo_inventario }}</td>
+                        <td data-label="Devolución">{% if d.devuelto %}{{ d.fecha_devolucion|date:"d/m/Y H:i" }} ({{ d.get_estado_devolucion_display }}){% else %}Pendiente{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

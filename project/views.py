@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import SolicitudPrestamoForm
 from .models import Equipo, Prestamo
@@ -80,4 +80,25 @@ def solicitar_equipo(request):
         'grupos': grupos.items(),
         'seleccionados': seleccionados,
         'max_equipos': settings.SOLICITUD_MAX_EQUIPOS,
+    })
+
+
+@login_required
+def detalle_prestamo(request, pk):
+    usuario = request.user
+    if not usuario.es_solicitante:
+        return redirect('index')
+    prestamo = get_object_or_404(
+        usuario.prestamos_solicitados.prefetch_related('detalles__equipo__categoria'), pk=pk)
+    return render(request, 'gestion/detalle_prestamo.html', {'prestamo': prestamo})
+
+
+@login_required
+def mis_adeudos(request):
+    usuario = request.user
+    if not usuario.es_solicitante:
+        return redirect('index')
+    return render(request, 'gestion/mis_adeudos.html', {
+        'vencidos': usuario.prestamos_vencidos().prefetch_related('detalles__equipo'),
+        'incidencias': usuario.incidencias_pendientes().select_related('equipo', 'prestamo'),
     })
