@@ -1,0 +1,317 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+{% block title %}{{ titulo_login }}{% endblock %}
+
+{% block header_img %}
+<div class="ED-wrapper">
+    <div class="ED-wrapper-L">
+        <a id="btn-menu" class="btn_menu">
+            <svg class="ED-aside" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </a>
+        <img src="{% static 'gestion/images/DipreSF.png' %}" alt="LOGO" class="ED-logo">  
+    </div>
+    <div class="ED-wrapper-L">
+        <p>Bienvenido Encargado</p>        
+    </div>
+</div>
+{% endblock header_img %}
+
+{% block content %}
+<main class="main_dis">
+    <aside id="menu-lateral" class="closed">
+        <nav class="aside-nav">
+            <a href="{% url 'enc-dash' %}" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#principal2"></use>
+                </svg>
+                <span>Principal</span>
+            </a>
+            <a href="{% url 'enc-pres' %}" class="aside-nav-select">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#prestamos2"></use>
+                </svg>
+                <span>Prestamos</span>
+            </a>
+            <a href="#" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#devoluciones"></use>
+                </svg>
+                <span>Devoluciones</span>
+            </a>
+            <a href="#" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#incidentes"></use>
+                </svg>
+                <span>Incidentes</span>
+            </a>
+            <a href="#" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#vencidos"></use>
+                </svg>
+                <span> Vencidos </span>
+            </a>
+            <a href="#" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#inventario"></use>
+                </svg>
+                <span>Inventario</span>
+            </a>
+            <a href="#" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#adeudos"></use>
+                </svg>
+                <span>Adeudos</span>
+            </a>
+            <a href="#" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#historial"></use>
+                </svg>
+                <span>Historial</span>
+            </a>
+            <hr>
+            <a href="{% url 'index' %}" class="aside-nav-otros">
+                <svg class="icons" viewBox="0 0 48 48">
+                    <use href="#logout"></use>
+                </svg>
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+    </aside>
+    <section class="EP-principal">
+        <div class="EP-menus">
+            <h1>Prestamos</h1>
+            <button class="btnPrestamo-Nuevo" id="bNew">+  Nuevo préstamo</button>
+            <div class="veil" id="veil"></div>
+        </div>
+        <section class="EP-menus-P">
+            <div class="EP-menus-P1">
+                <div class="EP-menus-btn">
+                    <button class="EP-menus-btn-u activo">Todos <b>6</b></button>
+                    <button class="EP-menus-btn-u">Activos <b>2</b></button>
+                    <button class="EP-menus-btn-u">Por vencer <b>1</b></button>
+                    <button class="EP-menus-btn-u">Vencidos <b>2</b></button>
+                    <button class="EP-menus-btn-u">Devueltos <b>1</b></button>
+                </div>
+                <label class="EP-search">
+                    <input placeholder="Estudiante, matrícula o equipo">
+                </label>  
+            </div>
+            <div class="tabla-scroll">
+                <table class="EP-table">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Equipo</th>
+                            <th>Prestamo</th>
+                            <th>Fecha Limite</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="EP-tr-s">
+                            <td class="EP-table-td">
+                                <b>Ana Pérez</b>
+                                <small>A01234</small>
+                            </td>
+                            <td class="EP-table-td">    
+                                <b>Laptop Dell Latitude</b>
+                                <small>LAP-014</small>
+                            </td>
+                            <td>01 nov</td>
+                            <td>05 nov</td>
+                            <td><span>Vencido</span></td>
+                        </tr>
+                        <tr class="detalle">
+                            <td colspan="5">
+                                <div class="detalle-contenido">
+                                    <p><b>Código:</b> LAP-014</p>
+                                    <p><b>Préstamo:</b> 01 nov</p>
+                                    <p><b>Límite:</b> 05 nov</p>
+                                    <p><b>Observaciones:</b> Entregado con cargador</p>
+                                    <button class="btn-devolver">Registrar devolución</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="EP-tr-s">
+                            <td class="EP-table-td">
+                                <b>Ana Pérez</b>
+                                <small>A01234</small>
+                            </td>
+                            <td class="EP-table-td">    
+                                <b>Laptop Dell Latitude</b>
+                                <small>LAP-014</small>
+                            </td>
+                            <td>01 nov</td>
+                            <td>05 nov</td>
+                            <td><span>Vencido</span></td>
+                        </tr>
+                        <tr class="detalle">
+                            <td colspan="5">
+                                <div class="detalle-contenido">
+                                    <p><b>Código:</b> LAP-014</p>
+                                    <p><b>Préstamo:</b> 01 nov</p>
+                                    <p><b>Límite:</b> 05 nov</p>
+                                    <p><b>Observaciones:</b> Entregado con cargador</p>
+                                    <button class="btn-devolver">Registrar devolución</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="EP-tr-s">
+                            <td class="EP-table-td">
+                                <b>Ana Pérez</b>
+                                <small>A01234</small>
+                            </td>
+                            <td class="EP-table-td">    
+                                <b>Laptop Dell Latitude</b>
+                                <small>LAP-014</small>
+                            </td>
+                            <td>01 nov</td>
+                            <td>05 nov</td>
+                            <td><span>Vencido</span></td>
+                        </tr>
+                        <tr class="detalle">
+                            <td colspan="5">
+                                <div class="detalle-contenido">
+                                    <p><b>Código:</b> LAP-014</p>
+                                    <p><b>Préstamo:</b> 01 nov</p>
+                                    <p><b>Límite:</b> 05 nov</p>
+                                    <p><b>Observaciones:</b> Entregado con cargador</p>
+                                    <button class="btn-devolver">Registrar devolución</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="EP-tr-s">
+                            <td class="EP-table-td">
+                                <b>Ana Pérez</b>
+                                <small>A01234</small>
+                            </td>
+                            <td class="EP-table-td">    
+                                <b>Laptop Dell Latitude</b>
+                                <small>LAP-014</small>
+                            </td>
+                            <td>01 nov</td>
+                            <td>05 nov</td>
+                            <td><span>Vencido</span></td>
+                        </tr>
+                        <tr class="detalle">
+                            <td colspan="5">
+                                <div class="detalle-contenido">
+                                    <p><b>Código:</b> LAP-014</p>
+                                    <p><b>Préstamo:</b> 01 nov</p>
+                                    <p><b>Límite:</b> 05 nov</p>
+                                    <p><b>Observaciones:</b> Entregado con cargador</p>
+                                    <button class="btn-devolver">Registrar devolución</button>
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr class="EP-tr-s">
+                            <td class="EP-table-td">
+                                <b>Ana Pérez</b>
+                                <small>A01234</small>
+                            </td>
+                            <td class="EP-table-td">    
+                                <b>Laptop Dell Latitude</b>
+                                <small>LAP-014</small>
+                            </td>
+                            <td>01 nov</td>
+                            <td>05 nov</td>
+                            <td><span>Vencido</span></td>
+                        </tr>
+                        <tr class="detalle">
+                            <td colspan="5">
+                                <div class="detalle-contenido">
+                                    <p><b>Código:</b> LAP-014</p>
+                                    <p><b>Préstamo:</b> 01 nov</p>
+                                    <p><b>Límite:</b> 05 nov</p>
+                                    <p><b>Observaciones:</b> Entregado con cargador</p>
+                                    <button class="btn-devolver">Registrar devolución</button>
+                                </div>
+                            </td>
+                        </tr>
+                                                <tr class="EP-tr-s">
+                            <td class="EP-table-td">
+                                <b>Ana Pérez</b>
+                                <small>A01234</small>
+                            </td>
+                            <td class="EP-table-td">    
+                                <b>Laptop Dell Latitude</b>
+                                <small>LAP-014</small>
+                            </td>
+                            <td>01 nov</td>
+                            <td>05 nov</td>
+                            <td><span>Vencido</span></td>
+                        </tr>
+                        <tr class="detalle">
+                            <td colspan="5">
+                                <div class="detalle-contenido">
+                                    <p><b>Código:</b> LAP-014</p>
+                                    <p><b>Préstamo:</b> 01 nov</p>
+                                    <p><b>Límite:</b> 05 nov</p>
+                                    <p><b>Observaciones:</b> Entregado con cargador</p>
+                                    <button class="btn-devolver">Registrar devolución</button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+
+</main>
+
+
+<!-- Esto es para el modal-->
+<!-- El modal -->
+<div class="modal" id="modal">
+  <h2>Nuevo préstamo</h2>
+
+  <div class="fld">
+    <label>Número de control (matrícula)</label>
+    <div class="vrow">
+      <input id="fM" placeholder="Ej. A01234">
+      <button class="btnPrestamo-Nuevo alt" id="bVer">Verificar</button>
+    </div>
+  </div>
+
+  <div class="vres" id="vRes">Verifica la matrícula para ver si tiene adeudos o incidentes.</div>
+
+  <div class="fld">
+    <label>Nombre del estudiante</label>
+    <input id="fN" placeholder="Se llena al verificar" readonly>
+  </div>
+
+  <div class="fld">
+    <label>Equipo disponible</label>
+    <select id="fE">
+      <option>Laptop Dell Latitude · LAP-014</option>
+      <option>Proyector Epson · PRO-003</option>
+      <option>Tablet Samsung · TAB-009</option>
+      <option>Cable HDMI 5 m · CAB-031</option>
+    </select>
+  </div>
+
+  <div class="fld">
+    <label>Fecha límite de devolución</label>
+    <input type="date" id="fD">
+  </div>
+
+  <div class="fld">
+    <label>Observaciones (opcional)</label>
+    <textarea id="fO" rows="2"></textarea>
+  </div>
+
+  <div class="mb">
+    <button class="btnPrestamo-Nuevo alt" id="mC">Cancelar</button>
+    <button class="btnPrestamo-Nuevo" id="mOk" disabled>Confirmar préstamo</button>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="{% static 'gestion/js/main.js' %}"></script>
+{% endblock %}

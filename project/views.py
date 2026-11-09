@@ -24,3 +24,5 @@ def login_todos(request):
     })
 def enc_dash(request):
     return render(request, 'gestion/encargado/encargado-dashboard.html')
+def enc_pres(request):
+    return render(request,'gestion/encargado/encargado-prestamos.html')

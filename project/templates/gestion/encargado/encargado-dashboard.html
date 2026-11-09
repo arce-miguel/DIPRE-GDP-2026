@@ -22,49 +22,49 @@
 <main class="main_dis">
     <aside id="menu-lateral" class="closed">
         <nav class="aside-nav">
-            <a class="aside-nav-select">
+            <a href="#" class="aside-nav-select">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#principal"></use>
                 </svg>
                 <span>Principal</span>
             </a>
-            <a class="aside-nav-otros">
+            <a href="{% url 'enc-pres' %}" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#prestamos"></use>
                 </svg>
                 <span>Prestamos</span>
             </a>
-            <a class="aside-nav-otros">
+            <a href="#" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#devoluciones"></use>
                 </svg>
                 <span>Devoluciones</span>
             </a>
-            <a class="aside-nav-otros">
+            <a href="#" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#incidentes"></use>
                 </svg>
                 <span>Incidentes</span>
             </a>
-            <a class="aside-nav-otros">
+            <a href="#" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#vencidos"></use>
                 </svg>
                 <span> Vencidos </span>
             </a>
-            <a class="aside-nav-otros">
+            <a href="#" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#inventario"></use>
                 </svg>
                 <span>Inventario</span>
             </a>
-            <a class="aside-nav-otros">
+            <a href="#" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#adeudos"></use>
                 </svg>
                 <span>Adeudos</span>
             </a>
-            <a class="aside-nav-otros">
+            <a href="#" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#historial"></use>
                 </svg>
@@ -161,21 +161,21 @@
             </div>
         </section>
 
-
         <section class="ED-menus">
             <div class="ED-subm">
                 <div class="titulo">
                     <svg class="icons"><use href="#rapidas"></use></svg>
                     <h2>ACCIONES RÁPIDAS</h2>
                 </div> 
-                <button type="submit" class="ED-subm-btn-r">
+                <button type="submit" class="ED-subm-btn-r" id="bNew">
                     <svg class="icons"><use href="#prestamos2"></use></svg>Nuevo Prestamo
                 </button>
+                <div class="veil" id="veil"></div><!-- Fondo oscuro detrás del modal -->
                 <button type="submit" class="ED-subm-btn-r">
                     <svg class="icons"><use href="#devoluciones2"></use></svg>Nueva Devolucion
                 </button>
                 <button type="submit" class="ED-subm-btn-r">
-                    <svg class="icons"><use href="#incidentes2"></use></svg>registra Incidente
+                    <svg class="icons"><use href="#incidentes2"></use></svg>Registra Incidente
                 </button>
             </div>
             <div class="ED-subm">
@@ -205,6 +205,51 @@
         </section>
     </section>
 </main>
+<!-- Esto es para el modal-->
+<!-- El modal -->
+<div class="modal" id="modal">
+  <h2>Nuevo préstamo</h2>
+
+  <div class="fld">
+    <label>Número de control (matrícula)</label>
+    <div class="vrow">
+      <input id="fM" placeholder="Ej. A01234">
+      <button class="btnPrestamo-Nuevo alt" id="bVer">Verificar</button>
+    </div>
+  </div>
+
+  <div class="vres" id="vRes">Verifica la matrícula para ver si tiene adeudos o incidentes.</div>
+
+  <div class="fld">
+    <label>Nombre del estudiante</label>
+    <input id="fN" placeholder="Se llena al verificar" readonly>
+  </div>
+
+  <div class="fld">
+    <label>Equipo disponible</label>
+    <select id="fE">
+      <option>Laptop Dell Latitude · LAP-014</option>
+      <option>Proyector Epson · PRO-003</option>
+      <option>Tablet Samsung · TAB-009</option>
+      <option>Cable HDMI 5 m · CAB-031</option>
+    </select>
+  </div>
+
+  <div class="fld">
+    <label>Fecha límite de devolución</label>
+    <input type="date" id="fD">
+  </div>
+
+  <div class="fld">
+    <label>Observaciones (opcional)</label>
+    <textarea id="fO" rows="2"></textarea>
+  </div>
+
+  <div class="mb">
+    <button class="btnPrestamo-Nuevo alt" id="mC">Cancelar</button>
+    <button class="btnPrestamo-Nuevo" id="mOk" disabled>Confirmar préstamo</button>
+  </div>
+</div>
 {% endblock %}
 
 

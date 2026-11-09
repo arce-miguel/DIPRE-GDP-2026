@@ -149,6 +149,7 @@ footer {
     align-items: center;
     padding: 40px;
     width: 100%;
+    min-height: 79vh;
 }
 .login-card {
     background-color: #ffffff;
@@ -225,7 +226,7 @@ footer {
     background-color: #ffffff;
 }
 
-/* Botón*/
+/* Botón login*/
 .login-submit-btn, .ED-subm-btn-r {
     width: 60%;
     height: 40px;
@@ -378,17 +379,20 @@ aside{
 }
 
 /*menú prinicpal del encargado*/
-.ED-principal {
+.ED-principal, .EP-principal {
     /*toda eso es para los elmentos hijos*/
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+
     width: 95%;
     max-width: 1200px;
     margin: 0 auto;
     gap: 20px;
     /*hasta aqui*/
+}
+.ED-principal {
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .ED-menus {
@@ -465,11 +469,11 @@ aside{
 }
 .ok {
     background: #d9efe3;
-    color: var(--ok);
+    color: #1f7a4d;
 }
 .nook {
     background: #f8dcda;
-    color: var(--warn);
+    color: #b3261e;
 }
 .search {
     display: flex;
@@ -493,13 +497,13 @@ aside{
 
 /* submenu 5*/
 .ED-subm-btn-r:hover {
-    background-color: #001a24;
+    background-color: #102945;
     color: #fff;
     box-shadow: 0 6px 16px #001a24;
 }
 .ED-subm-btn-r {
-    font-size:large;
-    background-color: #102945;
+    font-size: 15px;
+    background-color: #0c2a53;
     color: #fff;
 
     display: flex;
@@ -507,3 +511,240 @@ aside{
     align-items: center;
 }
 
+/*ENCARGADO PRESTAmos*/
+/* Fondo oscuro: oculto por defecto */
+.veil{
+  position:fixed;            /* se queda fijo sobre toda la pantalla */
+  inset:0;                   /* ocupa de borde a borde */
+  background:rgba(10,16,26,.6);
+  display:none;
+  z-index:20;                /* queda por encima de la página */
+}
+.veil.on{ display:block; }   /* con la clase "on" se muestra */
+
+/* Ventana modal: oculta por defecto */
+/* ---------- Modal ---------- */
+.modal{
+  position:fixed;
+  left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  width:min(440px, calc(100% - 24px));
+  max-height:92vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:18px;
+  padding:20px;
+  z-index:21;
+  display:none;
+}
+.modal.on{ display:block; }
+.modal h2{ margin:0 0 14px; font-size:20px; color:#102945; }
+
+/* ---------- Campos ---------- */
+.fld{ margin-bottom:12px; }
+.fld label{ display:block; font-size:13px; color:#5a6270; margin-bottom:4px; }
+.fld input,
+.fld select,
+.fld textarea{
+  width:100%;
+  border:1px solid #c9d0da;
+  border-radius:10px;
+  padding:10px 12px;
+  font:inherit; font-size:15px;
+  color:#0c1f34;
+  background:#fff;
+}
+.fld input[readonly]{ background:#f4f7fb; }
+
+/* ---------- Matrícula + botón Verificar ---------- */
+.vrow{ display:flex; gap:8px; }
+.vrow input{
+  flex:1; width:auto;
+  border:1px solid #c9d0da;
+  border-radius:10px;
+  padding:10px 12px;
+  font:inherit; font-size:15px;
+}
+
+/* ---------- Resultado de la verificación ---------- */
+.vres{
+  border-radius:10px;
+  padding:10px 12px;
+  font-size:13px;
+  margin-bottom:14px;
+  background:#eef3fa;
+  color:#0c2a53;
+}
+.vres.good{ background:#d9efe3; color:#1f7a4d; }
+.vres.bad { background:#f8dcda; color:#b3261e; }
+
+/* Botones */
+.btnPrestamo-Nuevo{
+  display:inline-flex; align-items:center; gap:8px;
+  border:1px solid #00a8cc;
+  background: #0c2a53;
+  color:#fff;
+  border-radius:12px;
+  padding:11px 16px;
+  font:inherit; font-size:15px;
+  cursor:pointer;
+}
+.btnPrestamo-Nuevo:hover{
+    background-color: #102945;
+    box-shadow: 0 6px 16px #001a24;
+}
+.btnPrestamo-Nuevo.alt{ background:#fff; color: #0c2a53; border-color:#c9d0da; }
+/* Zona de botones (pie del modal) */
+.mb{ display:flex; gap:10px; justify-content:flex-end; }
+
+/*Principal de encargado prestamos*/
+
+.EP-principal {
+    flex-direction: column;
+}
+.EP-principal h1{
+    color: #fff;
+}
+.EP-menus{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    padding-top: 20px;
+   
+}
+.EP-menus-P{
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    gap: 30px;
+    background-color: #fff;
+    height: 80%;
+    width: 100%;
+    border-radius: 16px;
+
+}
+.EP-menus-P1{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+
+}
+.EP-menus-btn {
+  display: flex;
+  gap: 20px;
+}
+
+.EP-menus-btn-u {
+  border: 1px solid #9cd0da;
+  background: #fff;
+  color: #0c2c63;
+  border-radius: 9999px;
+  padding: 7px 14px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.EP-menus-btn-u.activo {
+  background: #0c2c63;
+  color: #fff;
+}
+.EP-search{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #c9d0da;
+    border-radius: 10px;
+    padding: 0 12px;
+    min-width: 220px;
+    flex: 1;
+    max-width: 320px;
+    
+}
+.EP-search input {
+    border: 0;
+    outline: 0;
+    font: inherit;
+    font-size: 14px;
+    padding: 10px 0;
+    width: 100%;
+    color: #0c1f34;
+    background: none;
+}
+
+/*tabla de encargado prestamos*/
+.EP-table{
+  width:100%;
+  border-collapse:collapse; 
+  font-size:14px;
+}
+.EP-table thead th{
+    position:sticky;
+    top:0;
+    z-index:1;
+    background:#fff;
+    text-align:left;
+    border-bottom:2px solid #e4e7ec;
+}
+
+
+.EP-table th, .EP-table td {
+
+    padding: 10px 16px;
+}
+
+.EP-table-td b, .EP-table-td small {
+    display: block;
+}
+/*mas detalle de las opciones*/
+.EP-tr-s{ 
+    cursor:pointer; 
+    border-top: 1px solid #c9d0da; 
+}
+.EP-tr-s:hover{ 
+    background:#f4f7fb;
+}
+.detalle{
+    display:none;
+    cursor:default;
+}
+.detalle.abierta{ 
+    display:table-row; 
+}
+
+.detalle td{
+    font-size:14px;
+}
+.detalle p{ 
+    margin:4px 0; 
+}
+.detalle-contenido{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px 32px;
+}
+.detalle-contenido p{ margin:0; }
+.detalle-contenido .btn-devolver{ margin:0 0 0 auto; }
+.btn-devolver{
+    margin-top:12px;
+    padding:10px 16px;
+    border-radius:12px;
+    background:#0c2a53;
+    color:#fff;
+    font:inherit;
+    font-size:14px;
+    cursor:pointer;
+}
+.btn-devolver:hover{ 
+    background:#102945; 
+    box-shadow: 0 6px 16px #001a24;
+}
+.tabla-scroll{
+    max-height:420px;          /* a partir de esta altura aparece la barra */
+    overflow:auto;
+    scrollbar-gutter:stable;
+}
