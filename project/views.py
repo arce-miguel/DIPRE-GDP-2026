@@ -1,33 +1,77 @@
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from .forms import SolicitudPrestamoForm
-from .models import Equipo, Prestamo
+from .models import Bitacora, Equipo, Prestamo
+from .services import registrar
 
 # Create your views here.
 def index(request):
     return render(request, 'gestion/index.html')
 
+# Cada módulo de acceso: título, subtítulo, quién puede entrar y adónde va después
+MODULOS_LOGIN = {
+    'estudiante': {
+        'titulo': 'ESTUDIANTE',
+        'subtitulo': 'Ingrese con sus credenciales de estudiante',
+        'campo': 'Número de control',
+        'permitido': lambda u: u.es_solicitante,
+        'destino': 'panel_solicitante',
+    },
+    'encargado': {
+        'titulo': 'ENCARGADO',
+        'subtitulo': 'Ingrese datos de encargado',
+        'campo': 'Número de empleado',
+        'permitido': lambda u: u.es_encargado,
+        'destino': 'enc-dash',
+    },
+    'ADMIN': {
+        'titulo': 'ADMINISTRADOR',
+        'subtitulo': 'Ingrese datos de administrador',
+        'campo': 'Número de empleado',
+        'permitido': lambda u: u.es_administrador,
+        'destino': 'admin:index',
+    },
+}
+
+
 def login_todos(request):
     tipo = request.GET.get('tipo', 'estudiante')
-    
-    if tipo == 'encargado':
-        titulo_login = "ENCARGADO"
-        subtitulo = "Ingrese datos de encargado"
-    elif tipo == 'ADMIN':
-        titulo_login = "ADMINISTRADOR"
-        subtitulo = "Ingrese datos de administrador"
-    else:
-        titulo_login = "ESTUDIANTE"
-        subtitulo = "Ingrese con sus credenciales de estudiante"
+    modulo = MODULOS_LOGIN.get(tipo, MODULOS_LOGIN['estudiante'])
+    error = None
+
+    if request.method == 'POST':
+        usuario = authenticate(
+            request, username=request.POST.get('username', ''), password=request.POST.get('password', ''))
+        if usuario is None:
+            error = 'Número de control o contraseña incorrectos.'
+        elif not modulo['permitido'](usuario):
+            error = 'Esta cuenta no tiene acceso a este módulo.'
+        else:
+            login(request, usuario)
+            registrar(usuario, 'Inicio de sesión', 'usuario', usuario.pk, tipo=Bitacora.ACCESO)
+            siguiente = request.GET.get('next', '')
+            if siguiente and url_has_allowed_host_and_scheme(
+                    siguiente, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+                return redirect(siguiente)
+            return redirect(modulo['destino'])
 
     return render(request, 'gestion/login.html', {
-        'titulo_login': titulo_login,
-        'subtitulo': subtitulo,
-        'tipo': tipo
+        'titulo_login': modulo['titulo'],
+        'subtitulo': modulo['subtitulo'],
+        'campo_usuario': modulo['campo'],
+        'tipo': tipo,
+        'error': error,
     })
+
+
+def cerrar_sesion(request):
+    logout(request)
+    return redirect('index')
 
 
 @login_required
@@ -102,20 +146,3 @@ def mis_adeudos(request):
         'vencidos': usuario.prestamos_vencidos().prefetch_related('detalles__equipo'),
         'incidencias': usuario.incidencias_pendientes().select_related('equipo', 'prestamo'),
     })
-
-
-# --- Encargado ---
-def enc_dash(request):
-    return render(request, 'gestion/encargado/encargado-dashboard.html')
-
-
-def enc_pres(request):
-    return render(request,'gestion/encargado/encargado-prestamos.html')
-
-
-def enc_dev(request):
-    return render(request,'gestion/encargado/encargado-dev.html')
-
-
-def enc_inci(request):
-    return render(request,'gestion/encargado/encargado-incidentes.html')

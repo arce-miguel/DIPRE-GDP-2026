@@ -1,0 +1,42 @@
+{# Menú lateral del encargado. Parámetro: activo = principal | prestamos | devoluciones | incidentes #}
+<aside id="menu-lateral" class="closed">
+    <nav class="aside-nav">
+        <a href="{% url 'enc-dash' %}" class="{% if activo == 'principal' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'principal' %}principal{% else %}principal2{% endif %}"></use></svg>
+            <span>Principal</span>
+        </a>
+        <a href="{% url 'enc-pres' %}" class="{% if activo == 'prestamos' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'prestamos' %}prestamos2{% else %}prestamos{% endif %}"></use></svg>
+            <span>Prestamos</span>
+        </a>
+        <a href="{% url 'enc-dev' %}" class="{% if activo == 'devoluciones' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'devoluciones' %}devoluciones2{% else %}devoluciones{% endif %}"></use></svg>
+            <span>Devoluciones</span>
+        </a>
+        <a href="{% url 'enc-inci' %}" class="{% if activo == 'incidentes' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'incidentes' %}incidentes2{% else %}incidentes{% endif %}"></use></svg>
+            <span>Incidentes</span>
+        </a>
+        <a href="#" class="aside-nav-otros">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#vencidos"></use></svg>
+            <span> Vencidos </span>
+        </a>
+        <a href="#" class="aside-nav-otros">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#inventario"></use></svg>
+            <span>Inventario</span>
+        </a>
+        <a href="#" class="aside-nav-otros">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#adeudos"></use></svg>
+            <span>Adeudos</span>
+        </a>
+        <a href="#" class="aside-nav-otros">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#historial"></use></svg>
+            <span>Historial</span>
+        </a>
+        <hr>
+        <a href="{% url 'logout' %}" class="aside-nav-otros">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#logout"></use></svg>
+            <span>Cerrar Sesión</span>
+        </a>
+    </nav>
+</aside>

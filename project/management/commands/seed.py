@@ -1,10 +1,22 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.utils import timezone
 
-from project.models import Categoria, Equipo, Rol, Usuario
+from project.models import Categoria, DetallePrestamo, Equipo, Prestamo, Rol, Usuario
 
+PASSWORD = 'demo1234'
 SOLICITANTE_CORREO = 'solicitante@demo.local'
-SOLICITANTE_PASSWORD = 'demo1234'
+SOLICITANTE_PASSWORD = PASSWORD
+# (correo, nombre, rol, matrícula, número de empleado)
+USUARIOS = [
+    (SOLICITANTE_CORREO, 'Solicitante Demo', Rol.SOLICITANTE, 'DEMO0001', None),
+    ('ana@demo.local', 'Ana Pérez', Rol.SOLICITANTE, 'A01234', None),
+    ('luis@demo.local', 'Luis Ramírez', Rol.SOLICITANTE, 'A01877', None),
+    ('encargado@demo.local', 'Encargado Demo', Rol.ENCARGADO, None, 'ENC0001'),
+    ('admin@demo.local', 'Administrador Demo', Rol.ADMINISTRADOR, None, 'ADM0001'),
+]
 
 EQUIPOS = [
     ('Laptop', Categoria.POR_DIAS, 'Dell', 'Latitude 3420', 3),
@@ -15,7 +27,7 @@ EQUIPOS = [
 
 
 class Command(BaseCommand):
-    help = 'Crea datos de prueba (roles, categorías, equipos y un solicitante). Solo con DEBUG activo.'
+    help = 'Crea datos de prueba (roles, categorías, equipos, usuarios y préstamos). Solo con DEBUG activo.'
 
     def handle(self, *args, **options):
         if not settings.DEBUG:
@@ -32,8 +44,34 @@ class Command(BaseCommand):
                     defaults={'categoria': cat, 'marca': marca, 'modelo': modelo},
                 )
 
-        if not Usuario.objects.filter(correo=SOLICITANTE_CORREO).exists():
-            Usuario.objects.create_user(
-                SOLICITANTE_CORREO, 'Solicitante Demo', password=SOLICITANTE_PASSWORD, matricula='DEMO0001')
+        for correo, nombre, rol, matricula, num_empleado in USUARIOS:
+            if not Usuario.objects.filter(correo=correo).exists():
+                Usuario.objects.create_user(
+                    correo, nombre, password=PASSWORD, rol=rol,
+                    matricula=matricula, num_empleado=num_empleado)
+
+        self._prestamos_de_ejemplo()
 
         self.stdout.write(self.style.SUCCESS('Datos de prueba listos.'))
+
+    def _prestamos_de_ejemplo(self):
+        """Un préstamo vencido y una solicitud pendiente, para ver el panel del encargado con datos."""
+        if Prestamo.objects.exists():
+            return
+        ahora = timezone.now()
+        encargado = Usuario.objects.get(correo='encargado@demo.local')
+        ana = Usuario.objects.get(correo='ana@demo.local')
+        luis = Usuario.objects.get(correo='luis@demo.local')
+
+        laptop = Equipo.objects.get(codigo_inventario='LAP-001')
+        prestamo = Prestamo.objects.create(
+            solicitante=ana, usuario_registro=encargado, estado=Prestamo.ACTIVO,
+            fecha_entrega=ahora - timedelta(days=6), fecha_limite=ahora - timedelta(days=2),
+            motivo_tipo='tarea', motivo='Proyecto final')
+        DetallePrestamo.objects.create(prestamo=prestamo, equipo=laptop)
+        laptop.estado = Equipo.PRESTADO
+        laptop.save(update_fields=['estado'])
+
+        solicitud = Prestamo.objects.create(
+            solicitante=luis, fecha_limite=ahora + timedelta(days=2), motivo_tipo='practica')
+        DetallePrestamo.objects.create(prestamo=solicitud, equipo=Equipo.objects.get(codigo_inventario='CÁM-001'))

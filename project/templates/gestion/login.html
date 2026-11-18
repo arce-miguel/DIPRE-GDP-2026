@@ -15,15 +15,19 @@
         <h2 class="login-title">{{ titulo_login }}</h2>
         <p class="login-subtitle">{{ subtitulo }}</p>
 
+        {% if error %}
+        <div class="aviso aviso-error" role="alert">{{ error }}</div>
+        {% endif %}
+
         <form method="post">
             {% csrf_token %}
             <div class="login-input-group">
-                <label>Número Control</label>
-                <input class="uspas" type="text" id="username" name="username" placeholder="Numero de control" required />
+                <label for="username">{{ campo_usuario }}</label>
+                <input class="uspas" type="text" id="username" name="username" placeholder="{{ campo_usuario }}" value="{{ request.POST.username }}" autocomplete="username" required />
             </div>
             
             <div class="login-input-group">
-                <label>Contraseña</label>
+                <label for="password">Contraseña</label>
                 <input class="uspas" type="password" id="password" name="password" placeholder="********" required />
             </div>
             <div class="login-submit-btn-class">
@@ -31,9 +35,6 @@
                 
             </div>
             
-        </form>
-        <form method="get" action="{% url 'enc-dash' %}"> 
-            <button type="submit" class="login-submit-btn">PARA HACER PRUEBAS</button>
         </form>
     </div>
 </div>

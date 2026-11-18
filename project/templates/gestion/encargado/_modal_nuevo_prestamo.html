@@ -1,0 +1,49 @@
+{# Modal "Nuevo préstamo": verifica la matrícula contra la BD y registra el préstamo. #}
+<div class="veil" id="veil"></div>
+<form class="modal" id="modal" method="post" action="{% url 'enc-prestamo-nuevo' %}"
+      data-url-verificar="{% url 'enc-verificar' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <h2>Nuevo préstamo</h2>
+
+  <div class="fld">
+    <label for="fM">Número de control (matrícula)</label>
+    <div class="vrow">
+      <input id="fM" name="matricula" placeholder="Ej. A01234" autocomplete="off">
+      <button type="button" class="btnPrestamo-Nuevo alt" id="bVer">Verificar</button>
+    </div>
+  </div>
+
+  <div class="vres" id="vRes">Verifica la matrícula para ver si tiene adeudos o incidentes.</div>
+
+  <div class="fld">
+    <label for="fN">Nombre del estudiante</label>
+    <input id="fN" placeholder="Se llena al verificar" readonly>
+  </div>
+
+  <div class="fld">
+    <label for="fE">Equipo disponible</label>
+    <select id="fE" name="equipo" required>
+      {% for equipo in equipos_modal %}
+      <option value="{{ equipo.pk }}">{{ equipo.nombre }} · {{ equipo.codigo_inventario }}</option>
+      {% empty %}
+      <option value="" disabled selected>No hay equipo disponible</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="fld">
+    <label for="fD">Fecha y hora límite de devolución</label>
+    <input type="datetime-local" id="fD" name="fecha_limite" required>
+  </div>
+
+  <div class="fld">
+    <label for="fO">Observaciones (opcional)</label>
+    <textarea id="fO" name="observaciones" rows="2"></textarea>
+  </div>
+
+  <div class="mb">
+    <button type="button" class="btnPrestamo-Nuevo alt" id="mC">Cancelar</button>
+    <button type="submit" class="btnPrestamo-Nuevo" id="mOk" disabled>Confirmar préstamo</button>
+  </div>
+</form>

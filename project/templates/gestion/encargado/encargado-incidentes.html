@@ -1,96 +1,26 @@
 {% extends 'gestion/base.html' %}
 {% load static %}
-{% block title %}{{ titulo_login }}{% endblock %}
+{% block title %}Incidentes - Encargado{% endblock %}
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'gestion/css/styles-encargado.css' %}">
 {% endblock style %}
 
 {% block header_img %}
-<div class="ED-wrapper">
-    <div class="ED-wrapper-L">
-        <a id="btn-menu" class="btn_menu">
-            <svg class="ED-aside" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </a>
-        <img src="{% static 'gestion/images/DipreSF.png' %}" alt="LOGO" class="ED-logo">  
-    </div>
-    <div class="ED-wrapper-L">
-        <p>Bienvenido Encargado</p>        
-    </div>
-</div>
+{% include 'gestion/encargado/_cabecera.html' %}
 {% endblock header_img %}
 
 {% block layout %}
 <main class="main_dis">
-    <aside id="menu-lateral" class="closed">
-        <nav class="aside-nav">
-            <a href="{% url 'enc-dash' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#principal2"></use>
-                </svg>
-                <span>Principal</span>
-            </a>
-            <a href="{% url 'enc-pres' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#prestamos"></use>
-                </svg>
-                <span>Prestamos</span>
-            </a>
-            <a href="{% url 'enc-dev' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#devoluciones"></use>
-                </svg>
-                <span>Devoluciones</span>
-            </a>
-            <a href="#" class="aside-nav-select">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#incidentes2"></use>
-                </svg>
-                <span>Incidentes</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#vencidos"></use>
-                </svg>
-                <span> Vencidos </span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#inventario"></use>
-                </svg>
-                <span>Inventario</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#adeudos"></use>
-                </svg>
-                <span>Adeudos</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#historial"></use>
-                </svg>
-                <span>Historial</span>
-            </a>
-            <hr>
-            <a href="{% url 'index' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#logout"></use>
-                </svg>
-                <span>Cerrar Sesión</span>
-            </a>
-        </nav>
-    </aside>
+    {% include 'gestion/encargado/_aside.html' with activo='incidentes' %}
     <section class="EI-principal">
         <div class="EP-menus">
-            <h1>Indicentes</h1>
+            <h1>Incidentes</h1>
             <button class="EIn-btn" id="EIn-btnNuevo">+ Registrar incidente</button>
-            <div class="veil" id="veil"></div>
         </div>
+        {% include 'gestion/_mensajes.html' %}
         <section class="EIn-tarjeta">
-            <div class="EIn-herramientas">\
+            <div class="EIn-herramientas">
                 <div class="EIn-chips" id="EIn-chips"></div>
 
                 <label class="EIn-buscador">
@@ -100,54 +30,64 @@
             <div class="EIn-lista" id="EIn-lista"></div>
         </section>
         <div class="EIn-fondo" id="EIn-fondo"></div>
-        <div class="EIn-modal" id="EIn-modalNuevo">
+
+        <form class="EIn-modal" id="EIn-modalNuevo" method="post" action="{% url 'enc-incidente-nuevo' %}">
+            {% csrf_token %}
             <h2 class="EIn-modal-titulo">Registrar incidente</h2>
             <div class="EIn-campo">
-                <label class="EIn-campo-etiqueta">Equipo (y último estudiante que lo tuvo)</label>
-                <select class="EIn-campo-control" id="EIn-equipo">
-                    <option>Laptop Dell Latitude · LAP-014 · Ana Pérez · A01234</option>
-                    <option>Proyector Epson · PRO-001 · Luis Ramírez · A01877</option>
-                    <option>Tablet Samsung · TAB-005 · María Torres · A02011</option>
-                    <option>Laptop HP ProBook · LAP-018 · Carlos Medina · A01590</option>
-                    <option>Cable HDMI 5 m · CAB-012 · Sofía Núñez · A02145</option>
+                <label class="EIn-campo-etiqueta" for="EIn-equipo">Equipo (y último estudiante que lo tuvo)</label>
+                <select class="EIn-campo-control" id="EIn-equipo" name="equipo" required>
+                    {% for equipo in equipos_incidente %}
+                    <option value="{{ equipo.id }}">{{ equipo.texto }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="EIn-campo">
-                <label class="EIn-campo-etiqueta">Tipo de incidente</label>
-                <select class="EIn-campo-control" id="EIn-tipo">
-                    <option>Daño</option>
-                    <option>Falla</option>
-                    <option>Faltante</option>
-                    <option>Pérdida</option>
+                <label class="EIn-campo-etiqueta" for="EIn-tipo">Tipo de incidente</label>
+                <select class="EIn-campo-control" id="EIn-tipo" name="tipo">
+                    {% for clave, texto in tipos_incidente %}
+                    <option value="{{ clave }}">{{ texto }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="EIn-campo">
-                <label class="EIn-campo-etiqueta">Descripción</label>
-                <textarea class="EIn-campo-control" id="EIn-descripcion" rows="3" placeholder="¿Qué se encontró en el equipo?"></textarea>
+                <label class="EIn-campo-etiqueta" for="EIn-descripcion">Descripción</label>
+                <textarea class="EIn-campo-control" id="EIn-descripcion" name="descripcion" rows="3" placeholder="¿Qué se encontró en el equipo?"></textarea>
             </div>
             <div class="EIn-modal-pie">
-                <button class="EIn-btn EIn-btn-sec" data-cerrar="1">Cancelar</button>
-                <button class="EIn-btn" id="EIn-okNuevo" disabled>Registrar incidente</button>
+                <button type="button" class="EIn-btn EIn-btn-sec" data-cerrar="1">Cancelar</button>
+                <button type="submit" class="EIn-btn" id="EIn-okNuevo" disabled>Registrar incidente</button>
             </div>
-        </div>
-        <div class="EIn-modal" id="EIn-modalResolver">
-            <h2 class="EIn-modal-titulo">Marcar como resuelto</h2>
-            <div class="EIn-resumen" id="EIn-resolverResumen"></div>
-            <div class="EIn-campo">
-                <label class="EIn-campo-etiqueta">¿Cómo se resolvió? (opcional)</label>
-                <textarea class="EIn-campo-control" id="EIn-solucion" rows="2"
-                        placeholder="Ej. Se reemplazó la pieza"></textarea>
-            </div>
-            <div class="EIn-modal-pie">
-                <button class="EIn-btn EIn-btn-sec" data-cerrar="1">Cancelar</button>
-                <button class="EIn-btn" id="EIn-okResolver">Confirmar</button>
-            </div>
-        </div>
-        <div class="EIn-aviso" id="EIn-aviso"></div>
-    </section>  
+        </form>
 
+        <form class="EIn-modal" id="EIn-modalResolver" method="post"
+              data-url="{% url 'enc-incidente-resolver' 0 %}">
+            {% csrf_token %}
+            <h2 class="EIn-modal-titulo">Atender incidente</h2>
+            <div class="EIn-resumen" id="EIn-resolverResumen"></div>
+            <div class="EIn-campo" id="EIn-campoResolucion">
+                <label class="EIn-campo-etiqueta" for="EIn-resolucion">¿Qué se hizo con el equipo?</label>
+                <select class="EIn-campo-control" id="EIn-resolucion" name="resolucion"></select>
+            </div>
+            <div class="EIn-campo" id="EIn-campoSaldo">
+                <label class="EIn-campo-etiqueta" for="EIn-saldo">Adeudo del solicitante</label>
+                <select class="EIn-campo-control" id="EIn-saldo" name="forma_saldo">
+                    <option value="">Sigue pendiente</option>
+                    {% for clave, texto in formas_saldo %}
+                    <option value="{{ clave }}">{{ texto }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="EIn-modal-pie">
+                <button type="button" class="EIn-btn EIn-btn-sec" data-cerrar="1">Cancelar</button>
+                <button type="submit" class="EIn-btn" id="EIn-okResolver">Confirmar</button>
+            </div>
+        </form>
+        <div class="EIn-aviso" id="EIn-aviso"></div>
+    </section>
 </main>
-{% endblock %}
+{{ incidentes|json_script:"datos-incidentes" }}
+{% endblock layout %}
 
 
 {% block extra_js %}

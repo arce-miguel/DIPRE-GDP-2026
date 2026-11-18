@@ -1,37 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btnPrueba');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            alert('¡JavaScript y estáticos funcionando correctamente!');
-        });
-    }
-});
-document.addEventListener('DOMContentLoaded', () => {
-  const btnNuevo = document.getElementById('bNew');
-  const veil     = document.getElementById('veil');
-  const modal    = document.getElementById('modal');
-  const btnCerrar = document.getElementById('mC');
+/* ============================================================
+   Scripts del panel del encargado.
+   Cada bloque se activa solo si la página tiene los elementos
+   que necesita, así un mismo archivo sirve para todas las páginas.
+   Los datos vienen de Django (HTML ya renderizado o JSON); aquí
+   solo hay comportamiento: abrir modales, filtrar y verificar.
+   ============================================================ */
 
-  // Si esta página no tiene el modal, salimos sin dar error
-  if (!btnNuevo || !veil || !modal) return;
-
-  btnNuevo.addEventListener('click', () => {
-    veil.classList.add('on');
-    modal.classList.add('on');
-  });
-
-  btnCerrar.addEventListener('click', () => {
-    veil.classList.remove('on');
-    modal.classList.remove('on');
-  });
-
-  // Opcional: cerrar al tocar el fondo oscuro
-  veil.addEventListener('click', () => {
-    veil.classList.remove('on');
-    modal.classList.remove('on');
-  });
-});
-
+/* ---------- Menú lateral (se recuerda abierto/cerrado) ---------- */
 document.addEventListener('DOMContentLoaded', () => {
     const btnMenu = document.getElementById('btn-menu');
     const menuLateral = document.getElementById('menu-lateral');
@@ -70,23 +45,70 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     });
 });
-document.addEventListener('DOMContentLoaded', () => {
-  const botones = document.querySelectorAll('.EP-menus-btn-u');
 
-  botones.forEach(btn => {
-    btn.addEventListener('click', () => {
-      botones.forEach(b => b.classList.remove('activo'));
-      btn.classList.add('activo');
+
+/* ---------- Principal: accesos rápidos y buscador de equipo ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+    // Botones que solo llevan a otra página
+    document.querySelectorAll('[data-ir]').forEach((boton) => {
+        boton.addEventListener('click', () => { window.location.href = boton.dataset.ir; });
     });
-  });
+
+    // Buscador de "Equipo disponible"
+    const buscador = document.getElementById('buscar-equipo');
+    if (!buscador) return;
+    buscador.addEventListener('input', () => {
+        const texto = buscador.value.trim().toLowerCase();
+        document.querySelectorAll('[data-equipo]').forEach((fila) => {
+            fila.style.display = fila.dataset.equipo.includes(texto) ? '' : 'none';
+        });
+    });
 });
+
+
+/* ---------- Tablas de préstamos y devoluciones: filtros, búsqueda y detalle ---------- */
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.querySelector('.EP-table tbody');
     if (!tbody) return;
 
+    const botones = document.querySelectorAll('.EP-menus-btn-u');
+    const buscador = document.getElementById('buscar-tabla');
+
+    // El filtro inicial es el botón que viene marcado como "activo"
+    const inicial = document.querySelector('.EP-menus-btn-u.activo');
+    let filtro = inicial ? inicial.dataset.filtro : 'todos';
+
+    // ¿Esta fila (o su detalle) pasa el filtro de estado?
+    function pasaFiltro(fila) {
+        if (filtro === 'todos') return true;
+        if (filtro === 'por_devolver') return fila.dataset.devuelto === '0';
+        return fila.dataset.estado === filtro;
+    }
+
+    function aplicar() {
+        const texto = buscador ? buscador.value.trim().toLowerCase() : '';
+        tbody.querySelectorAll('tr[data-estado]').forEach((fila) => {
+            const visible = pasaFiltro(fila) && (!texto || fila.dataset.busqueda.includes(texto));
+            fila.hidden = !visible;
+            if (!visible && fila.classList.contains('detalle')) fila.classList.remove('abierta');
+        });
+    }
+
+    botones.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            botones.forEach((b) => b.classList.remove('activo'));
+            btn.classList.add('activo');
+            filtro = btn.dataset.filtro;
+            aplicar();
+        });
+    });
+    if (buscador) buscador.addEventListener('input', aplicar);
+    aplicar();
+
+    // Clic en una fila: abre o cierra su detalle
     tbody.addEventListener('click', (e) => {
-        // Si presionaron un botón o enlace, no expandir
-        if (e.target.closest('button') || e.target.closest('a')) return;
+        // Si presionaron un botón, enlace o campo, no expandir
+        if (e.target.closest('button, a, select, input')) return;
 
         const fila = e.target.closest('tr');
         if (!fila || fila.classList.contains('detalle')) return;
@@ -98,56 +120,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cerrar las demás
         tbody.querySelectorAll('tr.detalle.abierta')
-             .forEach(tr => tr.classList.remove('abierta'));
+             .forEach((tr) => tr.classList.remove('abierta'));
 
         // Abrir esta (si estaba abierta, queda cerrada)
         if (!estabaAbierta) detalle.classList.add('abierta');
     });
 });
+
+
+/* ---------- Modal "Nuevo préstamo": verifica la matrícula en la BD ---------- */
 document.addEventListener('DOMContentLoaded', () => {
-    const tbody = document.querySelector('.EP-table tbody');
-    if (!tbody) return;
-
-    tbody.addEventListener('click', (e) => {
-        const btn = e.target.closest('.btn-devolver');
-        if (!btn) return;
-
-        if (!confirm('¿Registrar la devolución de este equipo?')) return;
-
-        const detalle = btn.closest('tr.detalle');
-        const fila = detalle.previousElementSibling;   // la fila del préstamo
-
-        // Cambiar la etiqueta de estado
-        const estado = fila.querySelector('td > span');
-        estado.textContent = 'Devuelto';
-        estado.className = 's-devuelto';
-
-        // Quitar el botón y cerrar el detalle
-        btn.remove();
-        detalle.classList.remove('abierta');
-    });
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const btnNuevo = document.getElementById('bNew');
-    const veil     = document.getElementById('veil');
-    const modal    = document.getElementById('modal');
+    const btnNuevo  = document.getElementById('bNew');
+    const veil      = document.getElementById('veil');
+    const modal     = document.getElementById('modal');
     const btnCerrar = document.getElementById('mC');
-    const btnOk    = document.getElementById('mOk');
-    const btnVer   = document.getElementById('bVer');
-    const fM       = document.getElementById('fM');
-    const fN       = document.getElementById('fN');
-    const vRes     = document.getElementById('vRes');
+    const btnOk     = document.getElementById('mOk');
+    const btnVer    = document.getElementById('bVer');
+    const fM        = document.getElementById('fM');
+    const fN        = document.getElementById('fN');
+    const fD        = document.getElementById('fD');
+    const vRes      = document.getElementById('vRes');
 
-    // Si esta página no tiene el modal, salimos sin dar error
-    if (!btnNuevo || !veil || !modal) return;
-
-    // Datos de prueba (después vendrán de la base de datos)
-    const estudiantes = {
-        A01234: { nombre: 'Ana Pérez',    adeudos: 1, incidentes: 0 },
-        A01877: { nombre: 'Luis Ramírez', adeudos: 0, incidentes: 1 },
-        A02011: { nombre: 'María Torres', adeudos: 0, incidentes: 0 },
-        A01590: { nombre: 'Carlos Medina', adeudos: 0, incidentes: 0 },
-    };
+    // Si esta página no tiene el modal, salimos sin error
+    if (!btnNuevo || !veil || !modal || !fM) return;
 
     const MENSAJE_INICIAL = 'Verifica la matrícula para ver si tiene adeudos o incidentes.';
 
@@ -158,10 +153,25 @@ document.addEventListener('DOMContentLoaded', () => {
         btnOk.disabled = !permitir;
     }
 
+    // Valor para <input type="datetime-local"> (hora local, sin zona)
+    function aLocal(fecha) {
+        const dos = (n) => String(n).padStart(2, '0');
+        return `${fecha.getFullYear()}-${dos(fecha.getMonth() + 1)}-${dos(fecha.getDate())}` +
+               `T${dos(fecha.getHours())}:${dos(fecha.getMinutes())}`;
+    }
+
     function abrir() {
-        fM.value = '';
+        modal.reset();
         fN.value = '';
         mostrar('', MENSAJE_INICIAL, false);
+
+        // Por defecto el equipo se devuelve mañana a las 18:00
+        const manana = new Date();
+        manana.setDate(manana.getDate() + 1);
+        manana.setHours(18, 0, 0, 0);
+        fD.min = aLocal(new Date());
+        fD.value = aLocal(manana);
+
         veil.classList.add('on');
         modal.classList.add('on');
         fM.focus();
@@ -172,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('on');
     }
 
-    // Abrir y cerrar
     btnNuevo.addEventListener('click', abrir);
     if (btnCerrar) btnCerrar.addEventListener('click', cerrar);
     veil.addEventListener('click', cerrar);
@@ -180,87 +189,76 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') cerrar();
     });
 
-    // Verificar matrícula
-    function verificar() {
-        const mat = fM.value.trim().toUpperCase();
-
-        if (!mat) {
+    // Verificar matrícula contra la base de datos
+    async function verificar() {
+        const matricula = fM.value.trim();
+        if (!matricula) {
             mostrar('bad', 'Escribe el número de control.', false);
             return;
         }
 
-        const e = estudiantes[mat];
-        if (!e) {
-            fN.value = '';
-            mostrar('bad', 'Matrícula no encontrada.', false);
-            return;
-        }
+        try {
+            const respuesta = await fetch(
+                `${modal.dataset.urlVerificar}?matricula=${encodeURIComponent(matricula)}`,
+                { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const datos = await respuesta.json();
 
-        fN.value = e.nombre;
-
-        const pendientes = [];
-        if (e.adeudos)    pendientes.push(e.adeudos + (e.adeudos > 1 ? ' adeudos' : ' adeudo'));
-        if (e.incidentes) pendientes.push(e.incidentes + (e.incidentes > 1 ? ' incidentes' : ' incidente'));
-
-        if (pendientes.length) {
-            mostrar('bad', e.nombre + ' tiene ' + pendientes.join(' y ') + ' pendiente. No puede solicitar préstamo.', false);
-        } else {
-            mostrar('good', e.nombre + ': sin adeudos ni incidentes. Puede solicitar préstamo.', true);
+            fN.value = datos.encontrado ? datos.nombre : '';
+            mostrar(datos.encontrado && datos.puede ? 'good' : 'bad', datos.mensaje,
+                    datos.encontrado && datos.puede);
+        } catch (error) {
+            mostrar('bad', 'No se pudo verificar. Intenta de nuevo.', false);
         }
     }
 
     if (btnVer) btnVer.addEventListener('click', verificar);
 
-    // Enter dentro del campo de matrícula también verifica
-    if (fM) fM.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') verificar();
+    // Enter dentro del campo de matrícula verifica (sin enviar el formulario)
+    fM.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            verificar();
+        }
     });
 
     // Si cambian la matrícula, hay que verificar otra vez
-    if (fM) fM.addEventListener('input', () => {
+    fM.addEventListener('input', () => {
         fN.value = '';
         mostrar('', MENSAJE_INICIAL, false);
-    });
-
-    // Confirmar préstamo
-    if (btnOk) btnOk.addEventListener('click', () => {
-        const datos = {
-            matricula: fM.value.trim().toUpperCase(),
-            estudiante: fN.value,
-            equipo: document.getElementById('fE').value,
-            limite: document.getElementById('fD').value,
-            observaciones: document.getElementById('fO').value,
-        };
-        console.log('Préstamo a registrar:', datos);
-        // Aquí después irá el envío a Django
-        cerrar();
     });
 });
 
 
-//encargado dev
+/* ---------- Modal "Registrar devolución" ---------- */
 document.addEventListener('DOMContentLoaded', () => {
     const botonesDevolver = document.querySelectorAll('.btn-devolver1');
-    const veil            = document.getElementById('veil');
-    const modal           = document.getElementById('modal');
-    const btnCerrar       = document.getElementById('mC');
-    const btnOk           = document.getElementById('mOk');
-    
-    const checkboxIncidente   = document.getElementById('fInc');
-    const cajaIncidente       = document.getElementById('incBox');
-    const campoIncidenteTexto = document.getElementById('fIncT');
+    const veil      = document.getElementById('veil-dev');
+    const modal     = document.getElementById('modal-dev');
+    const btnCerrar = document.getElementById('mC-dev');
 
-    if (botonesDevolver.length === 0 || !veil || !modal) return;
+    const campoDetalle      = document.getElementById('fDetalle-dev');
+    const resumen           = document.getElementById('resumen-dev');
+    const checkboxIncidente = document.getElementById('fInc-dev');
+    const cajaIncidente     = document.getElementById('incBox-dev');
+    const textoIncidente    = document.getElementById('fIncT-dev');
+
+    if (!veil || !modal) return;
 
     function abrir(e) {
-        e.preventDefault(); // Evita comportamientos extraños del botón
-        
-        // Limpiar formulario al abrir
-        if (checkboxIncidente) checkboxIncidente.checked = false;
-        if (cajaIncidente) cajaIncidente.style.display = 'none';
-        if (campoIncidenteTexto) campoIncidenteTexto.value = '';
+        e.preventDefault();
+        const boton = e.currentTarget;
 
-        // Activar velo y modal con la clase 'on'
+        // Rellenar el formulario con el equipo que se devuelve
+        campoDetalle.value = boton.dataset.detalle;
+        resumen.querySelector('b').textContent = boton.dataset.equipo;
+        resumen.querySelector('small').textContent = boton.dataset.texto;
+
+        // Limpiar el apartado de incidente
+        checkboxIncidente.checked = false;
+        cajaIncidente.style.display = 'none';
+        textoIncidente.value = '';
+        textoIncidente.required = false;
+
         veil.classList.add('on');
         modal.classList.add('on');
     }
@@ -270,48 +268,24 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('on');
     }
 
-    // Vincular cada botón de la tabla
-    botonesDevolver.forEach(boton => {
-        boton.addEventListener('click', abrir);
-    });
-
-    // Cerrar con el botón cancelar
+    botonesDevolver.forEach((boton) => boton.addEventListener('click', abrir));
     if (btnCerrar) btnCerrar.addEventListener('click', cerrar);
-
-    // Cerrar al hacer clic en el fondo oscuro
     veil.addEventListener('click', cerrar);
-
-    // Cerrar con la tecla Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') cerrar();
     });
 
-    // Controlar el despliegue del textarea (expande el modal)
-    if (checkboxIncidente) {
-        checkboxIncidente.addEventListener('change', function() {
-            if (this.checked) {
-                cajaIncidente.style.display = 'flex'; // Muestra la caja y amplía el modal
-                if (campoIncidenteTexto) campoIncidenteTexto.focus();
-            } else {
-                cajaIncidente.style.display = 'none'; // Oculta la caja y reduce el modal
-                if (campoIncidenteTexto) campoIncidenteTexto.value = '';
-            }
-        });
-    }
-
-    // Botón confirmar devolución
-    if (btnOk) btnOk.addEventListener('click', () => {
-        const datosDevolucion = {
-            huboIncidente: checkboxIncidente ? checkboxIncidente.checked : false,
-            descripcion: campoIncidenteTexto ? campoIncidenteTexto.value.trim() : ''
-        };
-        console.log('Datos de devolución listos para enviar:', datosDevolucion);
-        // Aquí irá tu lógica para conectar con Django
-        cerrar();
+    // El cuadro de incidente solo aparece (y es obligatorio) si marcan la casilla
+    checkboxIncidente.addEventListener('change', () => {
+        const hay = checkboxIncidente.checked;
+        cajaIncidente.style.display = hay ? 'flex' : 'none';
+        textoIncidente.required = hay;
+        if (hay) textoIncidente.focus(); else textoIncidente.value = '';
     });
 });
 
-//Encargado inicentes
+
+/* ---------- Incidentes: tarjetas con filtro y búsqueda ---------- */
 document.addEventListener('DOMContentLoaded', () => {
 
     // Atajo para buscar elementos por su id
@@ -320,52 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Si esta página no tiene la lista de incidentes, salimos sin error
     if (!$('EIn-lista')) return;
 
-
-    /* ==========================================================
-       1. DATOS DE PRUEBA (después vendrán de Django)
-       ========================================================== */
-
-    // Fecha de "hoy" fija para que la demo se vea siempre igual.
-    // En el proyecto real usa: const HOY = new Date().toISOString().slice(0, 10);
-    const HOY = '2026-11-08';
+    // Los incidentes vienen de la base de datos (json_script de Django)
+    const incidentes = JSON.parse($('datos-incidentes').textContent);
 
     const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun',
                    'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-
-    // "resuelto" es la fecha en que se resolvió (o null si sigue abierto)
-    const incidentes = [
-        { equipo: 'Laptop Dell Latitude', codigo: 'LAP-014',
-          estudiante: 'Ana Pérez', matricula: 'A01234',
-          tipo: 'Daño', fecha: '2026-11-06', origen: 'Al devolver',
-          descripcion: 'Pantalla rayada en la esquina superior.',
-          resuelto: null, solucion: '' },
-
-        { equipo: 'Proyector Epson', codigo: 'PRO-001',
-          estudiante: 'Luis Ramírez', matricula: 'A01877',
-          tipo: 'Falla', fecha: '2026-11-07', origen: 'Revisión posterior',
-          descripcion: 'No enciende la lámpara.',
-          resuelto: null, solucion: '' },
-
-        { equipo: 'Cable HDMI 5 m', codigo: 'CAB-012',
-          estudiante: 'Sofía Núñez', matricula: 'A02145',
-          tipo: 'Faltante', fecha: '2026-11-05', origen: 'Al devolver',
-          descripcion: 'Falta el adaptador.',
-          resuelto: null, solucion: '' },
-
-        { equipo: 'Tablet Samsung', codigo: 'TAB-005',
-          estudiante: 'María Torres', matricula: 'A02011',
-          tipo: 'Daño', fecha: '2026-11-02', origen: 'Revisión posterior',
-          descripcion: 'Funda rota.',
-          resuelto: '2026-11-04', solucion: 'Se reemplazó la funda.' },
-    ];
-
-    // Icono de cada tipo (deben existir en tu bloque de iconos SVG)
-    const ICONOS = {
-        'Daño':     'alerta',
-        'Falla':    'ajustes',
-        'Faltante': 'inventario',
-        'Pérdida':  'buscar',
-    };
 
     // Los dos filtros
     const FILTROS = [
@@ -373,32 +306,20 @@ document.addEventListener('DOMContentLoaded', () => {
         { clave: 'resuelto', texto: 'Resueltos' },
     ];
 
-
-    /* ==========================================================
-       2. ESTADO (lo que cambia mientras se usa la página)
-       ========================================================== */
-
     let filtro = 'abierto';   // filtro seleccionado
     let busqueda = '';        // texto escrito en el buscador
-    let seleccionado = null;  // posición del incidente que se va a resolver
-
-
-    /* ==========================================================
-       3. FUNCIONES DE APOYO
-       ========================================================== */
 
     // '2026-11-05' -> '05 nov'
     function formatearFecha(iso) {
-        const [anio, mes, dia] = iso.split('-');
+        const [, mes, dia] = iso.split('-');
         return `${dia} ${MESES[Number(mes) - 1]}`;
     }
 
     // 'abierto' o 'resuelto'
     function estadoDe(incidente) {
-        return incidente.resuelto ? 'resuelto' : 'abierto';
+        return incidente.abierta ? 'abierto' : 'resuelto';
     }
 
-    // Cuántos incidentes hay en cada filtro
     function contar(clave) {
         return incidentes.filter((i) => estadoDe(i) === clave).length;
     }
@@ -412,20 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/"/g, '&quot;');
     }
 
-    // Aviso corto abajo de la pantalla
-function mostrarAviso(texto) {
-        const aviso = $('EIn-aviso');
-        if (!aviso) return;
-        aviso.textContent = texto;
-        aviso.style.opacity = 1;
-        setTimeout(() => { aviso.style.opacity = 0; }, 1900);
-    }
-
-
-    /* ==========================================================
-       4. DIBUJAR FILTROS Y TARJETAS
-       ========================================================== */
-
     function dibujarFiltros() {
         $('EIn-chips').innerHTML = FILTROS.map((f) => `
             <button class="EIn-chip ${filtro === f.clave ? 'EIn-chip-on' : ''}"
@@ -437,16 +344,20 @@ function mostrarAviso(texto) {
 
     // HTML de la tarjeta de un incidente
     function tarjetaHTML(i) {
-        const resuelto = Boolean(i.resuelto);
+        const resuelto = !i.abierta;
 
-        // Abajo a la derecha: botón "Resolver" o etiqueta "Resuelto"
+        // Abajo a la derecha: botón "Atender" o etiqueta "Resuelto"
         const accion = resuelto
-            ? `<span class="EIn-insignia EIn-insignia-resuelto">Resuelto ${formatearFecha(i.resuelto)}</span>`
-            : `<button class="EIn-btn EIn-btn-sm" data-resolver="${i.indice}">Resolver</button>`;
+            ? `<span class="EIn-insignia EIn-insignia-resuelto">Resuelto ${i.resuelto ? formatearFecha(i.resuelto) : ''}</span>`
+            : `<button class="EIn-btn EIn-btn-sm" data-resolver="${i.id}">${i.resuelta ? 'Saldar adeudo' : 'Resolver'}</button>`;
 
-        // La solución solo se muestra en los resueltos que la tengan
-        const solucion = resuelto && i.solucion
+        // Cómo se resolvió, si ya hay algo registrado
+        const solucion = i.solucion
             ? `<p class="EIn-inc-sol"><b>Solución:</b> ${escapar(i.solucion)}</p>`
+            : '';
+
+        const adeudo = i.adeudo_pendiente
+            ? '<p class="EIn-inc-sol"><b>Adeudo pendiente</b> del solicitante</p>'
             : '';
 
         return `
@@ -461,35 +372,28 @@ function mostrarAviso(texto) {
                 </div>
 
                 <p class="EIn-inc-desc">${escapar(i.descripcion)}</p>
-                <span class="EIn-inc-quien">${escapar(i.estudiante)} · ${escapar(i.matricula)}</span>
-                ${solucion}
+                <span class="EIn-inc-quien">${escapar(i.estudiante)}${i.matricula ? ' · ' + escapar(i.matricula) : ''}</span>
+                ${solucion}${adeudo}
 
                 <div class="EIn-inc-pie">
-                    <span>${formatearFecha(i.fecha)} · ${i.origen}</span>
+                    <span>${formatearFecha(i.fecha)} · ${escapar(i.origen)}</span>
                     ${accion}
                 </div>
 
             </div>`;
     }
 
-function dibujarLista() {
+    function dibujarLista() {
         const texto = busqueda.toLowerCase();
 
-        const visibles = incidentes
-            .map((i, indice) => ({ ...i, indice }))
-            .filter((i) => {
-                const datos = `${i.equipo} ${i.codigo} ${i.estudiante} ${i.matricula}`.toLowerCase();
-                return estadoDe(i) === filtro && (!texto || datos.includes(texto));
-            });
+        const visibles = incidentes.filter((i) => {
+            const datos = `${i.equipo} ${i.codigo} ${i.estudiante} ${i.matricula}`.toLowerCase();
+            return estadoDe(i) === filtro && (!texto || datos.includes(texto));
+        });
 
         $('EIn-lista').innerHTML = visibles.length
             ? visibles.map(tarjetaHTML).join('')
             : '<div class="EIn-vacio">No hay incidentes en esta vista.</div>';
-
-        if ($('EIn-contador')) {
-            $('EIn-contador').textContent =
-                `Mostrando ${visibles.length} de ${incidentes.length} incidentes`;
-        }
     }
 
     function dibujar() {
@@ -498,17 +402,13 @@ function dibujarLista() {
     }
 
 
-    /* ==========================================================
-       5. VENTANAS (MODALES)
-       ========================================================== */
+    /* ---------- Ventanas (modales) ---------- */
 
     function cerrarModales() {
         $('EIn-fondo').classList.remove('EIn-on');
         $('EIn-modalNuevo').classList.remove('EIn-on');
         $('EIn-modalResolver').classList.remove('EIn-on');
     }
-
-    // ---------- Ventana "Registrar incidente" ----------
 
     function abrirNuevo() {
         $('EIn-descripcion').value = '';
@@ -518,55 +418,35 @@ function dibujarLista() {
         $('EIn-modalNuevo').classList.add('EIn-on');
     }
 
-    function registrarIncidente() {
-        // La opción del equipo viene como: "Equipo · Código · Estudiante · Matrícula"
-        const [equipo, codigo, estudiante, matricula] = $('EIn-equipo').value.split(' · ');
+    function abrirResolver(id) {
+        const i = incidentes.find((x) => x.id === id);
+        if (!i) return;
 
-        incidentes.unshift({
-            equipo, codigo, estudiante, matricula,
-            tipo: $('EIn-tipo').value,
-            fecha: HOY,
-            origen: 'Revisión posterior',
-            descripcion: $('EIn-descripcion').value.trim(),
-            resuelto: null,
-            solucion: '',
-        });
-
-        filtro = 'abierto';
-        dibujar();
-        cerrarModales();
-        mostrarAviso('Incidente registrado');
-    }
-
-    // ---------- Ventana "Marcar como resuelto" ----------
-
-    function abrirResolver(indice) {
-        seleccionado = indice;
-        const i = incidentes[indice];
+        const formulario = $('EIn-modalResolver');
+        formulario.action = formulario.dataset.url.replace('/0/', `/${id}/`);
 
         $('EIn-resolverResumen').innerHTML =
             `<b class="EIn-resumen-titulo">${escapar(i.equipo)} · ${escapar(i.codigo)}</b>` +
-            `<small class="EIn-resumen-texto">${escapar(i.tipo)} · ${escapar(i.estudiante)} (${escapar(i.matricula)})</small>`;
+            `<small class="EIn-resumen-texto">${escapar(i.tipo)} · ${escapar(i.estudiante)}${i.matricula ? ' (' + escapar(i.matricula) + ')' : ''}</small>`;
 
-        $('EIn-solucion').value = '';
+        // Qué resoluciones tiene sentido ofrecer según el tipo de incidente
+        const select = $('EIn-resolucion');
+        select.innerHTML = i.opciones.map((o) =>
+            `<option value="${escapar(o.clave)}">${escapar(o.texto)}</option>`).join('');
+        select.disabled = i.resuelta;                         // el equipo ya se atendió
+        $('EIn-campoResolucion').style.display = i.resuelta ? 'none' : '';
+
+        // El apartado del adeudo solo aplica si el solicitante todavía debe
+        $('EIn-campoSaldo').style.display = i.adeudo_pendiente ? '' : 'none';
+        $('EIn-saldo').disabled = !i.adeudo_pendiente;
+        $('EIn-saldo').value = '';
 
         $('EIn-fondo').classList.add('EIn-on');
-        $('EIn-modalResolver').classList.add('EIn-on');
-    }
-
-    function confirmarResolucion() {
-        incidentes[seleccionado].resuelto = HOY;
-        incidentes[seleccionado].solucion = $('EIn-solucion').value.trim();
-
-        dibujar();
-        cerrarModales();
-        mostrarAviso('Incidente marcado como resuelto');
+        formulario.classList.add('EIn-on');
     }
 
 
-    /* ==========================================================
-       6. EVENTOS (qué pasa cuando el usuario hace clic o escribe)
-       ========================================================== */
+    /* ---------- Eventos ---------- */
 
     // Un solo "oyente" de clics para toda la página
     document.addEventListener('click', (e) => {
@@ -592,9 +472,11 @@ function dibujarLista() {
             return;
         }
 
-        if (objetivo.closest('#EIn-btnNuevo'))    { abrirNuevo(); return; }
-        if (objetivo.closest('#EIn-okNuevo'))     { registrarIncidente(); return; }
-        if (objetivo.closest('#EIn-okResolver'))  { confirmarResolucion(); return; }
+        if (objetivo.closest('#EIn-btnNuevo')) { abrirNuevo(); return; }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') cerrarModales();
     });
 
     // El botón "Registrar" solo se activa si hay descripción
@@ -607,11 +489,6 @@ function dibujarLista() {
         busqueda = e.target.value;
         dibujarLista();
     });
-
-
-    /* ==========================================================
-       7. ARRANQUE
-       ========================================================== */
 
     dibujar();
 });

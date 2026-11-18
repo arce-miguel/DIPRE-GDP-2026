@@ -1,0 +1,35 @@
+{# Modal "Registrar devolución": los botones .btn-devolver1 lo abren y le ponen el equipo. #}
+<div class="veil" id="veil-dev"></div>
+<form class="EDev-modal" id="modal-dev" method="post" action="{% url 'enc-devolver' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input type="hidden" name="detalle" id="fDetalle-dev">
+    <h2>Registrar devolución</h2>
+
+    <div class="EDev-resumen" id="resumen-dev">
+        <b></b>
+        <small></small>
+    </div>
+
+    <p class="EDev-modal-pregunta">¿Confirmas que el equipo fue devuelto?</p>
+
+    <label class="EDev-chk">
+        <input type="checkbox" id="fInc-dev" name="incidente">
+        Hubo un incidente con el equipo
+    </label>
+
+    <div class="EDev-fld" id="incBox-dev" style="display: none;">
+        <label for="fEstado-dev">¿Qué le pasó al equipo?</label>
+        <select id="fEstado-dev" name="estado_devolucion" class="EDev-select">
+            <option value="danado">Dañado</option>
+            <option value="perdido">Perdido</option>
+        </select>
+        <label for="fIncT-dev">Describe el incidente</label>
+        <textarea id="fIncT-dev" name="descripcion" rows="2" placeholder="Ej. Pantalla rayada, falta el cargador"></textarea>
+    </div>
+
+    <div class="EDev-mb">
+        <button type="button" class="EDev-btn EDev-alt" id="mC-dev">Cancelar</button>
+        <button type="submit" class="EDev-btn" id="mOk-dev">Confirmar devolución</button>
+    </div>
+</form>

@@ -1029,3 +1029,44 @@ aside{
 .EI-principal h1{
     color: #fff;
 }
+/* ---------- Estados de préstamo conectados a la BD ---------- */
+.borde-estado.pendiente { border-left-color: #8b5cf6; }  /* Violeta */
+.borde-estado.rechazado { border-left-color: #94a3b8; }  /* Gris */
+
+.estado-pendiente  { color: #6d28d9; }
+.estado-activo     { color: #1d4ed8; }
+.estado-por-vencer { color: #b45309; }
+.estado-vencido    { color: #b3261e; font-weight: 600; }
+.estado-devuelto   { color: #1f7a4d; }
+.estado-rechazado  { color: #64748b; }
+
+/* Acciones de una solicitud pendiente (aprobar / rechazar) */
+.detalle-contenido form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0;
+}
+.detalle-contenido select {
+    border: 1px solid #c9d0da;
+    border-radius: 10px;
+    padding: 9px 10px;
+    font: inherit;
+    font-size: 14px;
+}
+.detalle-contenido .btnPrestamo-Nuevo.btn-devolver1 { margin-left: 8px; padding: 6px 12px; }
+
+/* Select dentro del modal de devolución */
+.EDev-select {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font: inherit;
+    font-size: 14px;
+    background: #fff;
+}
+
+/* Avisos de Django dentro del panel del encargado */
+.ED-principal > .aviso,
+.EP-principal > .aviso,
+.EI-principal > .aviso { margin: 0 0 12px; }

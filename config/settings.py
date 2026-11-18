@@ -72,6 +72,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Usuario personalizado (project.models.Usuario); debe definirse antes del primer migrate
 AUTH_USER_MODEL = 'project.Usuario'
 
+# Inicio de sesión con matrícula, número de empleado o correo (ver project/backends.py)
+AUTHENTICATION_BACKENDS = ['project.backends.IdentificadorBackend']
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'index'
+
 # Minutos de tolerancia después de la fecha límite antes de marcar un préstamo como vencido
 TOLERANCIA_MINUTOS = 10
 
@@ -119,9 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Mexico_City'
 
 USE_I18N = True
 
@@ -131,7 +136,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
 
 
 # Email

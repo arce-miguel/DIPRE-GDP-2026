@@ -1,113 +1,44 @@
 {% extends 'gestion/base.html' %}
 
 {% load static %}
-{% block title %}{{ titulo_login }}{% endblock %}
+{% block title %}Principal - Encargado{% endblock %}
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'gestion/css/styles-encargado.css' %}">
 {% endblock style %}
 
 {% block header_img %}
-<div class="ED-wrapper">
-    <div class="ED-wrapper-L">
-        <a id="btn-menu" class="btn_menu">
-            <svg class="ED-aside" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </a>
-        <img src="{% static 'gestion/images/DipreSF.png' %}" alt="LOGO" class="ED-logo">  
-    </div>
-    <div class="ED-wrapper-L">
-        <p>Bienvenido Encargado</p>        
-    </div>
-</div>
+{% include 'gestion/encargado/_cabecera.html' %}
 {% endblock header_img %}
 
 {% block layout %}
 <main class="main_dis">
-    <aside id="menu-lateral" class="closed">
-        <nav class="aside-nav">
-            <a href="#" class="aside-nav-select">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#principal"></use>
-                </svg>
-                <span>Principal</span>
-            </a>
-            <a href="{% url 'enc-pres' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#prestamos"></use>
-                </svg>
-                <span>Prestamos</span>
-            </a>
-            <a href="{% url 'enc-dev' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#devoluciones"></use>
-                </svg>
-                <span>Devoluciones</span>
-            </a>
-            <a href="{% url 'enc-inci' %}"  class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#incidentes"></use>
-                </svg>
-                <span>Incidentes</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#vencidos"></use>
-                </svg>
-                <span> Vencidos </span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#inventario"></use>
-                </svg>
-                <span>Inventario</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#adeudos"></use>
-                </svg>
-                <span>Adeudos</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#historial"></use>
-                </svg>
-                <span>Historial</span>
-            </a>
-            <hr>
-            <a href="{% url 'index' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#logout"></use>
-                </svg>
-                <span>Cerrar Sesión</span>
-            </a>
-        </nav>
-    </aside>
+    {% include 'gestion/encargado/_aside.html' with activo='principal' %}
     <section class="ED-principal">
+        {% include 'gestion/_mensajes.html' %}
         <section class="ED-menus">
-                        <div class="ED-subm">
+            <div class="ED-subm">
                 <div class="titulo">
                     <svg class="icons"><use href="#conteos"></use></svg>
                     <h2>CONTEOS</h2>
-                </div> 
+                </div>
                 <div class="medio">
                     <div class="columna">
                         <b>Prestamos:</b>
                     </div>
-                    <span>2</span>
+                    <span>{{ conteos.prestamos }}</span>
                 </div>
                 <div class="medio">
                     <div class="columna">
                         <b>Incidentes:</b>
                     </div>
-                    <span>10</span>
+                    <span>{{ conteos.incidentes }}</span>
                 </div>
                 <div class="medio">
                     <div class="columna">
                         <b>Pendientes:</b>
                     </div>
-                    <span>9</span>
+                    <span>{{ conteos.pendientes }}</span>
                 </div>
             </div>
             <div class="ED-subm">
@@ -115,13 +46,21 @@
                     <svg class="icons"><use href="#vencidos"></use></svg>
                     <h2>VENCIDOS</h2>
                 </div>
+                {% for prestamo in vencidos %}
                 <div class="medio">
                     <div class="columna">
-                        <b>Diana M.</b>
-                        <small>El corazon de mi compa</small>
+                        <b>{{ prestamo.solicitante.nombre }}</b>
+                        <small>{{ prestamo.resumen_equipos }}</small>
                     </div>
-                    <span class="badge nook">8 días</span>
+                    <span class="badge nook">{{ prestamo.atraso }}</span>
                 </div>
+                {% empty %}
+                <div class="medio">
+                    <div class="columna">
+                        <small>No hay préstamos vencidos.</small>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </section>
 
@@ -133,36 +72,23 @@
                 </div>
                 <div class="search">
                     <svg class="icons"><use href="#buscar"></use></svg>
-                    <input type="text" placeholder="Buscar equipo o código" autocomplete="off">
+                    <input type="text" id="buscar-equipo" placeholder="Buscar equipo o código" autocomplete="off">
                 </div>
-                <div class="medio">
+                {% for equipo in equipos %}
+                <div class="medio" data-equipo="{{ equipo.nombre|lower }} {{ equipo.codigo_inventario|lower }}">
                     <div class="columna">
-                        <b>Laptop Dell Latitude</b>
-                        <small>LAP-014</small>
+                        <b>{{ equipo.nombre }}</b>
+                        <small>{{ equipo.codigo_inventario }}</small>
                     </div>
                     <span class="badge ok">Disponible</span>
                 </div>
+                {% empty %}
                 <div class="medio">
                     <div class="columna">
-                        <b>Laptop Dell Latitude</b>
-                        <small>LAP-014</small>
+                        <small>No hay equipo disponible.</small>
                     </div>
-                    <span class="badge ok">Disponible</span>
                 </div>
-                <div class="medio">
-                    <div class="columna">
-                        <b>Laptop Dell Latitude</b>
-                        <small>LAP-014</small>
-                    </div>
-                    <span class="badge ok">Disponible</span>
-                </div>
-                <div class="medio">
-                    <div class="columna">
-                        <b>Laptop Dell Latitude</b>
-                        <small>LAP-014</small>
-                    </div>
-                    <span class="badge ok">Disponible</span>
-                </div>
+                {% endfor %}
             </div>
         </section>
 
@@ -171,15 +97,14 @@
                 <div class="titulo">
                     <svg class="icons"><use href="#rapidas"></use></svg>
                     <h2>ACCIONES RÁPIDAS</h2>
-                </div> 
-                <button type="submit" class="ED-subm-btn-r" id="bNew">
+                </div>
+                <button type="button" class="ED-subm-btn-r" id="bNew">
                     <svg class="icons"><use href="#prestamos2"></use></svg>Nuevo Prestamo
                 </button>
-                <div class="veil" id="veil"></div>
-                <button type="submit" class="ED-subm-btn-r">
+                <button type="button" class="ED-subm-btn-r" data-ir="{% url 'enc-dev' %}">
                     <svg class="icons"><use href="#devoluciones2"></use></svg>Nueva Devolucion
                 </button>
-                <button type="submit" class="ED-subm-btn-r">
+                <button type="button" class="ED-subm-btn-r" data-ir="{% url 'enc-inci' %}">
                     <svg class="icons"><use href="#incidentes2"></use></svg>Registra Incidente
                 </button>
             </div>
@@ -188,75 +113,26 @@
                     <svg class="icons"><use href="#historial"></use></svg>
                     <h2>ACTIVIDAD RECIENTE</h2>
                 </div>
+                {% for registro in actividad %}
                 <div class="medio">
                     <div class="columna">
-                        <b>Prestamo registrado  </b>
-                        <small>Laptop Dell · LAP-014 - hace 10 min</small>
+                        <b>{{ registro.accion }}</b>
+                        <small>{{ registro.detalle }} - hace {{ registro.fecha_hora|timesince }}</small>
                     </div>
                 </div>
+                {% empty %}
                 <div class="medio">
                     <div class="columna">
-                        <b>Prestamo registrado  </b>
-                        <small>Laptop Dell · LAP-014 - hace 10 min</small>
+                        <small>Todavía no hay actividad.</small>
                     </div>
                 </div>
-                <div class="medio">
-                    <div class="columna">
-                        <b>Prestamo registrado  </b>
-                        <small>Laptop Dell · LAP-014 - hace 10 min</small>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </section>
     </section>
 </main>
-<!-- Esto es para el modal-->
-<!-- El modal -->
-<div class="modal" id="modal">
-  <h2>Nuevo préstamo</h2>
-
-  <div class="fld">
-    <label>Número de control (matrícula)</label>
-    <div class="vrow">
-      <input id="fM" placeholder="Ej. A01234">
-      <button class="btnPrestamo-Nuevo alt" id="bVer">Verificar</button>
-    </div>
-  </div>
-
-  <div class="vres" id="vRes">Verifica la matrícula para ver si tiene adeudos o incidentes.</div>
-
-  <div class="fld">
-    <label>Nombre del estudiante</label>
-    <input id="fN" placeholder="Se llena al verificar" readonly>
-  </div>
-
-  <div class="fld">
-    <label>Equipo disponible</label>
-    <select id="fE">
-      <option>Laptop Dell Latitude · LAP-014</option>
-      <option>Proyector Epson · PRO-003</option>
-      <option>Tablet Samsung · TAB-009</option>
-      <option>Cable HDMI 5 m · CAB-031</option>
-    </select>
-  </div>
-
-  <div class="fld">
-    <label>Fecha límite de devolución</label>
-    <input type="date" id="fD">
-  </div>
-
-  <div class="fld">
-    <label>Observaciones (opcional)</label>
-    <textarea id="fO" rows="2"></textarea>
-  </div>
-
-  <div class="mb">
-    <button class="btnPrestamo-Nuevo alt" id="mC">Cancelar</button>
-    <button class="btnPrestamo-Nuevo" id="mOk" disabled>Confirmar préstamo</button>
-  </div>
-</div>
-{% endblock %}
-
+{% include 'gestion/encargado/_modal_nuevo_prestamo.html' %}
+{% endblock layout %}
 
 {% block extra_js %}
 <script src="{% static 'gestion/js/main.js' %}"></script>

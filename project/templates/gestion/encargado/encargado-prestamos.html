@@ -1,106 +1,37 @@
 {% extends 'gestion/base.html' %}
 {% load static %}
-{% block title %}{{ titulo_login }}{% endblock %}
+{% block title %}Préstamos - Encargado{% endblock %}
 
 {% block style %}
 <link rel="stylesheet" href="{% static 'gestion/css/styles-encargado.css' %}">
 {% endblock style %}
 
 {% block header_img %}
-<div class="ED-wrapper">
-    <div class="ED-wrapper-L">
-        <a id="btn-menu" class="btn_menu">
-            <svg class="ED-aside" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </a>
-        <img src="{% static 'gestion/images/DipreSF.png' %}" alt="LOGO" class="ED-logo">  
-    </div>
-    <div class="ED-wrapper-L">
-        <p>Bienvenido Encargado</p>        
-    </div>
-</div>
+{% include 'gestion/encargado/_cabecera.html' %}
 {% endblock header_img %}
 
 {% block layout %}
 <main class="main_dis">
-    <aside id="menu-lateral" class="closed">
-        <nav class="aside-nav">
-            <a href="{% url 'enc-dash' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#principal2"></use>
-                </svg>
-                <span>Principal</span>
-            </a>
-            <a href="{% url 'enc-pres' %}" class="aside-nav-select">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#prestamos2"></use>
-                </svg>
-                <span>Prestamos</span>
-            </a>
-            <a href="{% url 'enc-dev' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#devoluciones"></use>
-                </svg>
-                <span>Devoluciones</span>
-            </a>
-            <a href="{% url 'enc-inci' %}"  class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#incidentes"></use>
-                </svg>
-                <span>Incidentes</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#vencidos"></use>
-                </svg>
-                <span> Vencidos </span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#inventario"></use>
-                </svg>
-                <span>Inventario</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#adeudos"></use>
-                </svg>
-                <span>Adeudos</span>
-            </a>
-            <a href="#" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#historial"></use>
-                </svg>
-                <span>Historial</span>
-            </a>
-            <hr>
-            <a href="{% url 'index' %}" class="aside-nav-otros">
-                <svg class="icons" viewBox="0 0 48 48">
-                    <use href="#logout"></use>
-                </svg>
-                <span>Cerrar Sesión</span>
-            </a>
-        </nav>
-    </aside>
+    {% include 'gestion/encargado/_aside.html' with activo='prestamos' %}
     <section class="EP-principal">
         <div class="EP-menus">
             <h1>Prestamos</h1>
             <button class="btnPrestamo-Nuevo" id="bNew">+  Nuevo préstamo</button>
-            <div class="veil" id="veil"></div>
         </div>
+        {% include 'gestion/_mensajes.html' %}
         <section class="EP-menus-P">
             <div class="EP-menus-P1">
                 <div class="EP-menus-btn">
-                    <button class="EP-menus-btn-u activo">Todos <b>6</b></button>
-                    <button class="EP-menus-btn-u">Activos <b>2</b></button>
-                    <button class="EP-menus-btn-u">Por vencer <b>1</b></button>
-                    <button class="EP-menus-btn-u">Vencidos <b>2</b></button>
-                    <button class="EP-menus-btn-u">Devueltos <b>1</b></button>
+                    <button type="button" class="EP-menus-btn-u activo" data-filtro="todos">Todos <b>{{ total }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="pendiente">Pendientes <b>{{ conteos.pendiente }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="activo">Activos <b>{{ conteos.activo }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="por_vencer">Por vencer <b>{{ conteos.por_vencer }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="vencido">Vencidos <b>{{ conteos.vencido }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="devuelto">Devueltos <b>{{ conteos.devuelto }}</b></button>
                 </div>
                 <label class="EP-search">
-                    <input placeholder="Estudiante, matrícula o equipo">
-                </label>  
+                    <input id="buscar-tabla" placeholder="Estudiante, matrícula o equipo" autocomplete="off">
+                </label>
             </div>
             <div class="tabla-scroll">
                 <table class="EP-table">
@@ -114,137 +45,79 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="EP-tr-s">
-                            <td class="EP-table-td borde-estado">
-                                <b>Ana Pérez</b>
-                                <small>A01234</small>
-                            </td>
-                            <td class="EP-table-td">    
-                                <b>Laptop Dell Latitude</b>
-                                <small>LAP-014</small>
-                            </td>
-                            <td>01 nov</td>
-                            <td>05 nov</td>
-                            <td><span>Vencido</span></td>
-                        </tr>
-                        <tr class="detalle">
-                            <td colspan="5">
-                                <div class="detalle-contenido">
-                                    <p><b>Código:</b> LAP-014</p>
-                                    <p><b>Préstamo:</b> 01 nov</p>
-                                    <p><b>Límite:</b> 05 nov</p>
-                                    <p><b>Observaciones:</b> Entregado con cargador</p>
-                                    <button class="btnPrestamo-Nuevo btn-devolver1">Devolver</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="EP-tr-s">
+                        {% for prestamo in prestamos %}
+                        <tr class="EP-tr-s borde-estado {{ prestamo.css }}" data-estado="{{ prestamo.clave }}" data-busqueda="{{ prestamo.busqueda }}">
                             <td class="EP-table-td">
-                                <b>Ana Pérez</b>
-                                <small>A01234</small>
+                                <b>{{ prestamo.solicitante.nombre }}</b>
+                                <small>{{ prestamo.solicitante.identificador }}</small>
                             </td>
-                            <td class="EP-table-td">    
-                                <b>Laptop Dell Latitude</b>
-                                <small>LAP-014</small>
+                            <td class="EP-table-td">
+                                {% with detalles=prestamo.detalles.all %}
+                                <b>{{ detalles.0.equipo.nombre }}{% if detalles|length > 1 %} +{{ detalles|length|add:"-1" }}{% endif %}</b>
+                                <small>{{ detalles.0.equipo.codigo_inventario }}</small>
+                                {% endwith %}
                             </td>
-                            <td>01 nov</td>
-                            <td>05 nov</td>
-                            <td><span>Vencido</span></td>
+                            <td>{{ prestamo.fecha_entrega|default:prestamo.fecha_solicitud|date:"d M" }}</td>
+                            <td>{{ prestamo.fecha_limite|date:"d M H:i" }}</td>
+                            <td><span class="estado-{{ prestamo.css }}">{{ prestamo.etiqueta }}</span></td>
                         </tr>
-                        <tr class="detalle">
+                        <tr class="detalle" data-estado="{{ prestamo.clave }}" data-busqueda="{{ prestamo.busqueda }}">
                             <td colspan="5">
                                 <div class="detalle-contenido">
-                                    <p><b>Código:</b> LAP-014</p>
-                                    <p><b>Préstamo:</b> 01 nov</p>
-                                    <p><b>Límite:</b> 05 nov</p>
-                                    <p><b>Observaciones:</b> Entregado con cargador</p>
-                                    <button class="btn-devolver">Registrar devolución</button>
+                                    <p><b>Solicitud:</b> #{{ prestamo.pk }}</p>
+                                    <p><b>Motivo:</b> {{ prestamo.motivo_completo }}</p>
+                                    {% if prestamo.observaciones %}<p><b>Observaciones:</b> {{ prestamo.observaciones }}</p>{% endif %}
                                 </div>
+                                <div class="detalle-contenido">
+                                    {% for detalle in prestamo.detalles.all %}
+                                    <p>
+                                        <b>{{ detalle.equipo.nombre }}</b> · {{ detalle.equipo.codigo_inventario }}
+                                        {% if detalle.devuelto %}
+                                        — devuelto {{ detalle.fecha_devolucion|date:"d M" }} ({{ detalle.get_estado_devolucion_display }})
+                                        {% elif prestamo.estado == 'activo' %}
+                                        <button type="button" class="btnPrestamo-Nuevo btn-devolver1"
+                                                data-detalle="{{ detalle.pk }}"
+                                                data-equipo="{{ detalle.equipo.nombre }} · {{ detalle.equipo.codigo_inventario }}"
+                                                data-texto="{{ prestamo.solicitante.nombre }} ({{ prestamo.solicitante.identificador }}) · límite {{ prestamo.fecha_limite|date:'d M H:i' }}{% if prestamo.clave == 'vencido' %} · con retraso{% endif %}">Devolver</button>
+                                        {% endif %}
+                                    </p>
+                                    {% endfor %}
+                                </div>
+                                {% if prestamo.estado == 'pendiente' %}
+                                <div class="detalle-contenido">
+                                    <form method="post" action="{% url 'enc-prestamo-aprobar' prestamo.pk %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button type="submit" class="btnPrestamo-Nuevo">Aprobar y entregar</button>
+                                    </form>
+                                    <form method="post" action="{% url 'enc-prestamo-rechazar' prestamo.pk %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <select name="motivo" required>
+                                            <option value="" disabled selected>Motivo del rechazo…</option>
+                                            {% for clave, texto in motivos_rechazo %}
+                                            <option value="{{ clave }}">{{ texto }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btnPrestamo-Nuevo alt">Rechazar</button>
+                                    </form>
+                                </div>
+                                {% endif %}
                             </td>
                         </tr>
+                        {% empty %}
+                        <tr><td colspan="5">Todavía no hay préstamos registrados.</td></tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </section>
     </section>
-
 </main>
 
-
-<!-- Esto es para el modal-->
-<!-- El modal -->
-<div class="modal" id="modal">
-  <h2>Nuevo préstamo</h2>
-
-  <div class="fld">
-    <label>Número de control (matrícula)</label>
-    <div class="vrow">
-      <input id="fM" placeholder="Ej. A01234">
-      <button class="btnPrestamo-Nuevo alt" id="bVer">Verificar</button>
-    </div>
-  </div>
-
-  <div class="vres" id="vRes">Verifica la matrícula para ver si tiene adeudos o incidentes.</div>
-
-  <div class="fld">
-    <label>Nombre del estudiante</label>
-    <input id="fN" placeholder="Se llena al verificar" readonly>
-  </div>
-
-  <div class="fld">
-    <label>Equipo disponible</label>
-    <select id="fE">
-      <option>Laptop Dell Latitude · LAP-014</option>
-      <option>Proyector Epson · PRO-003</option>
-      <option>Tablet Samsung · TAB-009</option>
-      <option>Cable HDMI 5 m · CAB-031</option>
-    </select>
-  </div>
-
-  <div class="fld">
-    <label>Fecha límite de devolución</label>
-    <input type="date" id="fD">
-  </div>
-
-  <div class="fld">
-    <label>Observaciones (opcional)</label>
-    <textarea id="fO" rows="2"></textarea>
-  </div>
-
-  <div class="mb">
-    <button class="btnPrestamo-Nuevo alt" id="mC">Cancelar</button>
-    <button class="btnPrestamo-Nuevo" id="mOk" disabled>Confirmar préstamo</button>
-  </div>
-</div>
-
-<!-- Contenedor del Modal de prestamos -->
-<div class="EDev-modal" id="modal-dev">
-    <h2>Registrar devolución</h2>
-    
-    <div class="EDev-resumen" id="resumen-dev">
-        <b>Laptop Dell Latitude · LAP-014</b>
-        <small>Ana Pérez (A01234) · límite 05 nov · con retraso</small>
-    </div>
-    
-    <p class="EDev-modal-pregunta">¿Confirmas que el equipo fue devuelto?</p>
-    
-    <label class="EDev-chk">
-        <input type="checkbox" id="fInc-dev">
-        Hubo un incidente con el equipo
-    </label>
-    
-    <div class="EDev-fld" id="incBox-dev" style="display: none;">
-        <label>Describe el incidente</label>
-        <textarea id="fIncT-dev" rows="2" placeholder="Ej. Pantalla rayada, falta el cargador"></textarea>
-    </div>
-    
-    <div class="EDev-mb">
-        <!-- IDs únicos para que no choquen con los del otro modal -->
-        <button class="EDev-btn EDev-alt" id="mC-dev">Cancelar</button>
-        <button class="EDev-btn" id="mOk-dev">Confirmar devolución</button>
-    </div>
-</div>
-{% endblock %}
+{% include 'gestion/encargado/_modal_nuevo_prestamo.html' %}
+{% include 'gestion/encargado/_modal_devolucion.html' %}
+{% endblock layout %}
 
 
 {% block extra_js %}
