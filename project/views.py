@@ -15,7 +15,7 @@ def login_todos(request):
     
     if tipo == 'encargado':
         titulo_login = "ENCARGADO"
-        subtitulo = "Ingrese con su cuenta y clave institucional docente"
+        subtitulo = "Ingrese datos de encargado"
     elif tipo == 'ADMIN':
         titulo_login = "ADMINISTRADOR"
         subtitulo = "Ingrese datos de administrador"
@@ -102,3 +102,20 @@ def mis_adeudos(request):
         'vencidos': usuario.prestamos_vencidos().prefetch_related('detalles__equipo'),
         'incidencias': usuario.incidencias_pendientes().select_related('equipo', 'prestamo'),
     })
+
+
+# --- Encargado ---
+def enc_dash(request):
+    return render(request, 'gestion/encargado/encargado-dashboard.html')
+
+
+def enc_pres(request):
+    return render(request,'gestion/encargado/encargado-prestamos.html')
+
+
+def enc_dev(request):
+    return render(request,'gestion/encargado/encargado-dev.html')
+
+
+def enc_inci(request):
+    return render(request,'gestion/encargado/encargado-incidentes.html')

@@ -12,14 +12,14 @@ html, body {
     flex-direction: column;
 }
 .logo-img{
-    width: 70px;
+    width: 60px;
     height: auto;
 }
 /* Layout general */
 .navbar-custom {
-    background-color: #212529;
+    background-color: #0c1f34;
     color: #fff;
-    padding: 16px;
+    padding: 15px 15px;
     text-align: center;
     align-items: center;
 }
@@ -36,11 +36,12 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
 }
 
 
 .footer-custom {
-    background-color: #212529;
+    background-color: #0c1f34;
     color: #fff;
     text-align: center;
     padding: 16px;
@@ -51,11 +52,19 @@ html, body {
 .footer-custom p {
     color: #adb5bd;
 }
+header {
+    border-bottom: 2px solid #2196F3;
+    height: 90px;
+}
+
+footer {
+    border-top: 2px solid #2196f3;
+}
 
 /*Index */
 .index-wrapper {
     background-color: #102945;
-    padding: 24px 16px;
+    padding: 24px 20px;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -72,7 +81,7 @@ html, body {
 
 .card {
     border-radius: 16px;
-    padding: 32px;
+   
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -81,11 +90,15 @@ html, body {
 .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 16px rgba(33, 149, 243, 0.349);
 }
 
 .card-icon {
     font-size: 40px;
     margin-bottom: 12px;
+    height: 60px;
+    width: auto;
+    margin: 0%;
 }
 
 .card h3 {
@@ -102,9 +115,10 @@ html, body {
     text-decoration: none;
     color: inherit;
     display: block;
+    padding: 32px;
 }
 .estudent {
-    background-color: #cecece;
+    background-color: #ffffff;
     color: #212529;
 }
 
@@ -129,20 +143,18 @@ html, body {
 
 
 /* PAL LOGIN */
-/* Contenedor general para centrar el módulo de acceso */
 .login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 40px;
     width: 100%;
+    min-height: 79vh;
 }
-
-/* Tarjeta principal del formulario */
 .login-card {
     background-color: #ffffff;
     padding: 32px;
-    border-radius: 16px;
+    border-radius: 40px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     width: 100%;
     max-width: 440px;
@@ -169,7 +181,6 @@ html, body {
     color: #000;
 }
 
-/* Encabezados */
 .login-title {
     font-weight: 700;
     color: #212529;
@@ -186,7 +197,7 @@ html, body {
     text-align: center;
 }
 
-/* Grupos de campos de formulario */
+
 .login-input-group {
     margin-bottom: 16px;
 }
@@ -211,16 +222,16 @@ html, body {
 
 .login-input-group input:focus {
     outline: none;
-    border-color: #102945; /* Coincide con tu azul institucional */
+    border-color: #102945;
     background-color: #ffffff;
 }
 
-/* Botón de acción principal */
-.login-submit-btn {
+/* Botón login*/
+.login-submit-btn, .ED-subm-btn-r {
     width: 60%;
     height: 40px;
     padding: 12px;
-    background-color: #102945;
+    background-color: #0c2a53;
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -228,11 +239,15 @@ html, body {
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
     margin-top: 8px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ED-subm-btn-r{
+    width: 90% !important;
 }
 
-.login-submit-btn:hover {
-    background-color: #0b1d35;
-    transform: scale(1.05);
+.login-submit-btn:hover{
+    background-color: #025e83;
+    box-shadow: 0 6px 16px rgb(0, 54, 75);
 }
 .uspas:focus {
     outline: none;          

@@ -5,20 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistema de Préstamos{% endblock %}</title>
     {% load static %}
+
     <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
+    {% block style %}
+    {% endblock %}
     <link rel="icon" href="{% static 'gestion/images/icon.ico' %}" type="image/x-icon">
 </head>
 <body>
-    <nav class="navbar-custom">
-        <a href="{% url 'index' %}">
-            <img src="{% static 'gestion/images/LogoDipre.png' %}" alt="LOGO" class="logo-img">
-        </a>
-    </nav>
+    {% include 'gestion/svg_sprites.html' %}
+    <header class="navbar-custom">
+        <div>
+            {% block header_img %}
+            <a href="{% url 'index' %}">
+                <img src="{% static 'gestion/images/LogoDipre.png' %}" alt="LOGO" class="logo-img">
+            </a>
+            {% endblock %}
+        </div>
+    </header>
 
+    {# Las páginas normales llenan "content" y reciben el <main> centrado. #}
+    {# Las del encargado reemplazan "layout" completo porque traen su propio <main> con aside. #}
+    {% block layout %}
     <main class="main-content">
         {% block content %}
         {% endblock %}
     </main>
+    {% endblock layout %}
 
     <footer class="footer-custom">
         <div>
@@ -26,5 +38,7 @@
             <p>&copy; 2026 - Derechos reservados DIPRE asociados y Jose</p>
         </div>
     </footer>
+    {% block extra_js %}
+    {% endblock extra_js %}
 </body>
 </html>
