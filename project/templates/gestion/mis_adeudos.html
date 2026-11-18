@@ -1,0 +1,50 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Mis adeudos - Sistema{% endblock %}
+
+{% block content %}
+<div class="panel-wrapper">
+
+    <header class="panel-header">
+        <div>
+            <h1>Mis adeudos</h1>
+            <p>Mientras tengas adeudos no puedes solicitar nuevos equipos.</p>
+        </div>
+        <a href="{% url 'panel_solicitante' %}" class="btn-primary">Volver al panel</a>
+    </header>
+
+    {% if vencidos %}
+    <section class="panel-card">
+        <h2>Préstamos vencidos</h2>
+        <p class="empty">Devuelve estos equipos con el encargado para regularizarte.</p>
+        <ul class="lista-adeudos">
+            {% for p in vencidos %}
+            <li><a href="{% url 'detalle_prestamo' p.pk %}">#{{ p.pk }}</a>: {{ p.resumen_equipos }}. Venció el {{ p.fecha_limite|date:"d/m/Y H:i" }}.</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if incidencias %}
+    <section class="panel-card">
+        <h2>Daños y pérdidas</h2>
+        <p class="empty">Se saldan reponiendo el equipo o pagando su costo. Acude con el encargado.</p>
+        <ul class="lista-adeudos">
+            {% for i in incidencias %}
+            <li>
+                <strong>{{ i.equipo.nombre }}</strong>: {{ i.get_tipo_display|lower }}, registrado el {{ i.fecha|date:"d/m/Y" }}.
+                {% if i.descripcion %}<br><small>{{ i.descripcion }}</small>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if not vencidos and not incidencias %}
+    <section class="panel-card">
+        <p class="empty">No tienes adeudos pendientes.</p>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}
