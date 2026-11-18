@@ -8,14 +8,14 @@ DIPRE-GDP/
 │   ├── settings.py        <-- Aquí configuras MySQL
 │   ├── urls.py            <-- Rutas principales
 │   └── wsgi.py
-└──"GESTION"/
+└── project/
     ├── models.py          <-- AQUÍ defines las tablas de la DB en código Python
     ├── views.py           <-- Lógica para responder a las vistas/rutas
     ├── admin.py           <-- Panel de administración que viene listo
     └── migrations/        <-- ¡AQUÍ se crea el SQL automáticamente!
     ├── templates/
     │   └── gestion/
-    │       ├── base.html        <-- Plantilla principal (navbar, footer, Bootstrap CDN)
+    │       ├── base.html        <-- Plantilla principal (navbar, footer)
     │       └── index.html       <-- Página de inicio (hereda de base.html)
     └── static/
         └── gestion/
