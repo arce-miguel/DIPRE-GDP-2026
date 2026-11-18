@@ -1,0 +1,7 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{# Base de las páginas del estudiante: añade su propio CSS sobre el compartido #}
+{% block style %}
+<link rel="stylesheet" href="{% static 'gestion/css/styles-solicitante.css' %}">
+{% endblock style %}
