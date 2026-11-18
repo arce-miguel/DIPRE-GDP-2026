@@ -1,6 +1,11 @@
 {% extends 'gestion/base.html' %}
+
 {% load static %}
 {% block title %}{{ titulo_login }}{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'gestion/css/styles-encargado.css' %}">
+{% endblock style %}
 
 {% block header_img %}
 <div class="ED-wrapper">
@@ -34,13 +39,13 @@
                 </svg>
                 <span>Prestamos</span>
             </a>
-            <a href="#" class="aside-nav-otros">
+            <a href="{% url 'enc-dev' %}" class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#devoluciones"></use>
                 </svg>
                 <span>Devoluciones</span>
             </a>
-            <a href="#" class="aside-nav-otros">
+            <a href="{% url 'enc-inci' %}"  class="aside-nav-otros">
                 <svg class="icons" viewBox="0 0 48 48">
                     <use href="#incidentes"></use>
                 </svg>
@@ -170,7 +175,7 @@
                 <button type="submit" class="ED-subm-btn-r" id="bNew">
                     <svg class="icons"><use href="#prestamos2"></use></svg>Nuevo Prestamo
                 </button>
-                <div class="veil" id="veil"></div><!-- Fondo oscuro detrás del modal -->
+                <div class="veil" id="veil"></div>
                 <button type="submit" class="ED-subm-btn-r">
                     <svg class="icons"><use href="#devoluciones2"></use></svg>Nueva Devolucion
                 </button>

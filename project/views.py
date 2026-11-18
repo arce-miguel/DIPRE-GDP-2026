@@ -26,3 +26,7 @@ def enc_dash(request):
     return render(request, 'gestion/encargado/encargado-dashboard.html')
 def enc_pres(request):
     return render(request,'gestion/encargado/encargado-prestamos.html')
+def enc_dev(request):
+    return render(request,'gestion/encargado/encargado-dev.html')
+def enc_inci(request):
+    return render(request,'gestion/encargado/encargado-incidentes.html')

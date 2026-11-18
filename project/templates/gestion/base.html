@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sistema de Préstamos{% endblock %}</title>
     {% load static %}
+
+    {% block style %}
+    {% endblock %}
+    
     <link rel="stylesheet" href="{% static 'gestion/css/styles.css' %}">
     <link rel="icon" href="{% static 'gestion/images/icon.ico' %}" type="image/x-icon">
 </head>

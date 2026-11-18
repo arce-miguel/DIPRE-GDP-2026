@@ -8,4 +8,7 @@ urlpatterns = [
 
 
     path('encargado-pres',views.enc_pres, name='enc-pres'),   
+    path('encargado-dev', views.enc_dev, name='enc-dev'),
+    path('encargado-inci', views.enc_inci, name='enc-inci'),
+
 ]
