@@ -1,0 +1,44 @@
+{% extends 'gestion/base_solicitante.html' %}
+
+{% block title %}Mi cuenta - Sistema{% endblock %}
+
+{% block content %}
+<div class="panel-wrapper">
+
+    <header class="panel-header">
+        <div>
+            <h1>Mi cuenta</h1>
+            <p>Tus datos y tu contraseña</p>
+        </div>
+    </header>
+
+    {% include 'gestion/_mensajes.html' %}
+
+    <section class="panel-card">
+        <h2>Mis datos</h2>
+        <dl class="datos">
+            <dt>Nombre</dt><dd>{{ user.nombre }}</dd>
+            <dt>Número de control</dt><dd>{{ user.identificador }}</dd>
+            <dt>Correo</dt><dd>{{ user.correo }}</dd>
+            <dt>Rol</dt><dd>{{ user.rol }}</dd>
+        </dl>
+    </section>
+
+    <section class="panel-card">
+        <h2>Cambiar contraseña</h2>
+        <form method="post" class="form-solicitud">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="aviso aviso-error">{{ form.non_field_errors }}</div>{% endif %}
+            {% for campo in form %}
+            <div class="campo">
+                <label for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                {{ campo }}
+                {% for error in campo.errors %}<span class="campo-error">{{ error }}</span>{% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn-primary">Guardar contraseña</button>
+        </form>
+    </section>
+
+</div>
+{% endblock %}

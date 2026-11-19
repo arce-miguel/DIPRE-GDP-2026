@@ -1,0 +1,129 @@
+/* ==========================================================
+   CABECERA Y BARRA LATERAL de los paneles (encargado y solicitante).
+   Componente compartido: lo cargan las dos bases de rol.
+   El comportamiento (abrir/cerrar) está en js/sidebar.js
+   ========================================================== */
+
+/* Cabecera del panel */
+.ED-wrapper {
+    display: flex; 
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+.ED-wrapper p{
+    font-size: auto ;
+}
+.ED-wrapper-L{
+    display: flex; 
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+
+}
+.ED-logo{
+    height: 50px;
+    width: auto;
+    display: block;
+}
+.ED-aside {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+/*ESte es el button para mostrar el sidebar*/
+.btn_menu{
+    color: #fff;
+    text-decoration: none;
+}
+.btn_menu:visited {
+    color: black;
+}
+.btn_menu:hover {
+    color: #fff; 
+    transform: scale(1.05);
+}
+
+/*sidebar*/
+.main_dis{
+    display: flex;
+    min-height: 90vh;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    flex-direction: row;
+    width: 100%;
+}
+aside{
+    background-color: #c1c1c2;
+    margin: 0%;
+    height: 100%;
+    width: 170px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border-right: 2px solid #2196F3;
+    
+}
+
+.aside_img{
+    width: 80px;
+    height: auto;
+    box-sizing: border-box;
+    padding-bottom: 0%;
+    padding-top: 20px;
+}
+
+.aside-nav{
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: 0 auto;
+    gap: 8px;
+    padding-top: 15px;
+}
+.aside-nav-select, .aside-nav-otros{
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.icons {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.aside-nav-select {
+    background-color: #102945;
+    color: #fff !important;
+}
+.aside-nav-select:hover {
+    background-color: #0a101a;
+}
+.aside-nav-otros {
+    color: #102945;
+}
+
+.aside-nav-otros:hover {
+    background-color: #d1d5db;
+    color: #0f172a;
+}
+
+/*parte del js*/
+#menu-lateral {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+#menu-lateral.closed {
+    margin-left: -200px; 
+}

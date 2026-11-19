@@ -10,7 +10,11 @@ urlpatterns = [
     path('panel/', views.panel_solicitante, name='panel_solicitante'),
     path('solicitar/', views.solicitar_equipo, name='solicitar_equipo'),
     path('prestamo/<int:pk>/', views.detalle_prestamo, name='detalle_prestamo'),
+    path('mis-prestamos/', views.mis_prestamos, name='mis_prestamos'),
     path('adeudos/', views.mis_adeudos, name='mis_adeudos'),
+    path('catalogo/', views.catalogo, name='catalogo'),
+    path('reglas/', views.reglas, name='reglas'),
+    path('cuenta/', views.mi_cuenta, name='mi_cuenta'),
 
     # Encargado: páginas
     path('encargado-dashb', enc.enc_dash, name='enc-dash'),

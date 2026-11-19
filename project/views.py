@@ -1,15 +1,42 @@
+from functools import wraps
+
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 
 from .forms import SolicitudPrestamoForm
-from .models import Bitacora, Equipo, Prestamo
+from .models import Bitacora, Categoria, Equipo, Prestamo
 from .services import registrar
 
-# Create your views here.
+# Cuántos préstamos se muestran en el inicio (el resto está en "Mis préstamos")
+RECIENTES = 5
+
+# Filtros de "Mis préstamos": la clave es el estado que se muestra
+FILTROS_PRESTAMO = [
+    ('todos', 'Todos'),
+    ('pendiente', 'Pendientes'),
+    ('activo', 'Activos'),
+    ('vencido', 'Vencidos'),
+    ('devuelto', 'Devueltos'),
+    ('rechazado', 'Rechazados'),
+]
+
+
+def solicitante_required(vista):
+    """Solo estudiantes con sesión iniciada; a cualquier otro rol lo manda al inicio."""
+    @login_required
+    @wraps(vista)
+    def envoltura(request, *args, **kwargs):
+        if not request.user.es_solicitante:
+            return redirect('index')
+        return vista(request, *args, **kwargs)
+    return envoltura
+
+
 def index(request):
     return render(request, 'gestion/index.html')
 
@@ -74,12 +101,9 @@ def cerrar_sesion(request):
     return redirect('index')
 
 
-@login_required
+@solicitante_required
 def panel_solicitante(request):
     usuario = request.user
-    if not usuario.es_solicitante:
-        return redirect('index')
-
     prestamos = list(
         usuario.prestamos_solicitados
         .prefetch_related('detalles__equipo__categoria')
@@ -92,19 +116,17 @@ def panel_solicitante(request):
     }
     incidencias = list(usuario.incidencias_pendientes().select_related('equipo__categoria'))
     return render(request, 'gestion/panel_solicitante.html', {
-        'prestamos': prestamos,
+        'prestamos': prestamos[:RECIENTES],
+        'hay_mas': len(prestamos) > RECIENTES,
         'resumen': resumen,
         'tiene_adeudos': bool(incidencias) or resumen['vencidos'] > 0,
         'incidencias_pendientes': incidencias,
     })
 
 
-@login_required
+@solicitante_required
 def solicitar_equipo(request):
     usuario = request.user
-    if not usuario.es_solicitante:
-        return redirect('index')
-
     tiene_adeudos = usuario.tiene_adeudos
     form = SolicitudPrestamoForm(request.POST or None, solicitante=usuario)
     if request.method == 'POST' and form.is_valid():
@@ -127,22 +149,86 @@ def solicitar_equipo(request):
     })
 
 
-@login_required
+@solicitante_required
+def mis_prestamos(request):
+    """Todos mis préstamos, con filtro por estado (el estado 'vencido' se calcula, no se guarda)."""
+    filtro = request.GET.get('estado', 'todos')
+    if filtro not in dict(FILTROS_PRESTAMO):
+        filtro = 'todos'
+
+    prestamos = list(
+        request.user.prestamos_solicitados
+        .prefetch_related('detalles__equipo__categoria').order_by('-fecha_solicitud'))
+    conteos = {clave: 0 for clave, _ in FILTROS_PRESTAMO}
+    for p in prestamos:
+        conteos['todos'] += 1
+        conteos[p.estado_visible] += 1
+
+    visibles = prestamos if filtro == 'todos' else [p for p in prestamos if p.estado_visible == filtro]
+    return render(request, 'gestion/mis_prestamos.html', {
+        'prestamos': visibles,
+        'filtro': filtro,
+        'filtros': [(clave, texto, conteos[clave]) for clave, texto in FILTROS_PRESTAMO],
+    })
+
+
+@solicitante_required
 def detalle_prestamo(request, pk):
-    usuario = request.user
-    if not usuario.es_solicitante:
-        return redirect('index')
     prestamo = get_object_or_404(
-        usuario.prestamos_solicitados.prefetch_related('detalles__equipo__categoria'), pk=pk)
+        request.user.prestamos_solicitados.prefetch_related('detalles__equipo__categoria'), pk=pk)
     return render(request, 'gestion/detalle_prestamo.html', {'prestamo': prestamo})
 
 
-@login_required
+@solicitante_required
 def mis_adeudos(request):
     usuario = request.user
-    if not usuario.es_solicitante:
-        return redirect('index')
     return render(request, 'gestion/mis_adeudos.html', {
         'vencidos': usuario.prestamos_vencidos().prefetch_related('detalles__equipo'),
         'incidencias': usuario.incidencias_pendientes().select_related('equipo', 'prestamo'),
     })
+
+
+@solicitante_required
+def catalogo(request):
+    """Equipo que existe en el inventario y cuántos hay disponibles ahora, por categoría."""
+    visibles = [Equipo.DISPONIBLE, Equipo.PRESTADO, Equipo.MANTENIMIENTO]
+    categorias = []
+    for categoria in Categoria.objects.all():
+        equipos = list(categoria.equipos.filter(estado__in=visibles))
+        if not equipos:
+            continue
+        categoria.lista = equipos
+        categoria.disponibles = sum(1 for e in equipos if e.disponible)
+        categorias.append(categoria)
+    return render(request, 'gestion/catalogo.html', {
+        'categorias': categorias,
+        'tiene_adeudos': request.user.tiene_adeudos,
+        'max_horas': settings.SOLICITUD_MAX_HORAS,
+        'max_dias': settings.SOLICITUD_MAX_DIAS,
+        'apertura': settings.HORARIO_SERVICIO[0],
+        'cierre': settings.HORARIO_SERVICIO[1],
+    })
+
+
+@solicitante_required
+def reglas(request):
+    return render(request, 'gestion/reglas.html', {
+        'max_equipos': settings.SOLICITUD_MAX_EQUIPOS,
+        'max_horas': settings.SOLICITUD_MAX_HORAS,
+        'max_dias': settings.SOLICITUD_MAX_DIAS,
+        'apertura': settings.HORARIO_SERVICIO[0],
+        'cierre': settings.HORARIO_SERVICIO[1],
+        'tolerancia': settings.TOLERANCIA_MINUTOS,
+    })
+
+
+@solicitante_required
+def mi_cuenta(request):
+    form = PasswordChangeForm(request.user, request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        usuario = form.save()
+        update_session_auth_hash(request, usuario)  # la sesión actual sigue abierta
+        registrar(usuario, 'Contraseña cambiada', 'usuario', usuario.pk, tipo=Bitacora.ACCESO)
+        messages.success(request, 'Tu contraseña se actualizó.')
+        return redirect('mi_cuenta')
+    return render(request, 'gestion/mi_cuenta.html', {'form': form})

@@ -1,0 +1,45 @@
+{% extends 'gestion/base_solicitante.html' %}
+
+{% block title %}Reglas del servicio - Sistema{% endblock %}
+
+{% block content %}
+<div class="panel-wrapper">
+
+    <header class="panel-header">
+        <div>
+            <h1>Reglas del servicio</h1>
+            <p>Lo que debes saber antes de pedir equipo</p>
+        </div>
+    </header>
+
+    <section class="panel-card">
+        <h2>Solicitudes</h2>
+        <ul class="reglas-lista">
+            <li>Puedes pedir hasta <b>{{ max_equipos }} equipos</b> en una misma solicitud.</li>
+            <li>No se mezclan equipos <b>por horas</b> con equipos <b>por días</b> en la misma solicitud.</li>
+            <li>Toda solicitud queda <b>pendiente</b> hasta que el encargado la apruebe y te entregue el equipo.</li>
+            <li>Si el encargado la rechaza, verás el motivo en <b>Mis préstamos</b>.</li>
+        </ul>
+    </section>
+
+    <section class="panel-card">
+        <h2>Tiempos de préstamo</h2>
+        <ul class="reglas-lista">
+            <li><b>Por días:</b> hasta {{ max_dias }} días.</li>
+            <li><b>Por horas:</b> hasta {{ max_horas }} horas, se devuelve el mismo día y dentro del horario de servicio ({{ apertura }}:00 a {{ cierre }}:00).</li>
+            <li>Hay <b>{{ tolerancia }} minutos de tolerancia</b> después de la fecha límite; pasado ese tiempo el préstamo se marca como vencido.</li>
+        </ul>
+    </section>
+
+    <section class="panel-card">
+        <h2>Adeudos</h2>
+        <ul class="reglas-lista">
+            <li>Un préstamo vencido sin devolver es un adeudo.</li>
+            <li>Si devuelves un equipo dañado o lo pierdes, el adeudo dura hasta que lo <b>repongas o pagues su costo</b> con el encargado; que el equipo se repare no lo salda.</li>
+            <li>Mientras tengas adeudos no puedes solicitar equipo nuevo.</li>
+        </ul>
+        <p class="ver-mas"><a href="{% url 'mis_adeudos' %}">Ver mis adeudos →</a></p>
+    </section>
+
+</div>
+{% endblock %}

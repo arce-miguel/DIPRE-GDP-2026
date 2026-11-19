@@ -1,0 +1,28 @@
+{# Tabla de préstamos del solicitante. Parámetro: prestamos #}
+<div class="table-scroll">
+    <table class="loan-table">
+        <thead>
+            <tr>
+                <th>Equipo</th>
+                <th>Categoría</th>
+                <th>Solicitado</th>
+                <th>Fecha límite</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in prestamos %}
+            <tr>
+                <td data-label="Equipo"><a href="{% url 'detalle_prestamo' p.pk %}">{{ p.resumen_equipos }}</a></td>
+                <td data-label="Categoría">{{ p.resumen_categorias }}</td>
+                <td data-label="Solicitado">{{ p.fecha_solicitud|date:"d/m/Y" }}</td>
+                <td data-label="Fecha límite">{{ p.fecha_limite|date:"d/m/Y H:i" }}</td>
+                <td data-label="Estado"><span class="badge badge-{{ p.estado_visible }}">{{ p.estado_visible|capfirst }}</span></td>
+            </tr>
+            {% if p.estado == 'rechazado' and p.observaciones %}
+            <tr class="fila-nota"><td colspan="5">Motivo del rechazo: {{ p.observaciones }}</td></tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

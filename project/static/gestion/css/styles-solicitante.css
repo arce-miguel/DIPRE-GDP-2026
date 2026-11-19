@@ -218,3 +218,70 @@
 .equipo-codigo { color: #6c757d; font-size: 13px; }
 .equipo-regla { color: #0d6efd; font-size: 13px; }
 .form-solicitud .btn-primary:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.7; }
+
+
+/* ---------- Contenido junto a la barra lateral ---------- */
+.sol-contenido {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+}
+
+/* Aviso rojo junto a "Mis adeudos" en el menú */
+.aside-aviso {
+    margin-left: auto;
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #dc3545;
+    color: #fff;
+    font-size: 12px;
+    line-height: 18px;
+    text-align: center;
+}
+
+/* ---------- Filtros de "Mis préstamos" ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.chip {
+    padding: 6px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 999px;
+    background-color: #fff;
+    color: #212529;
+    font-size: 14px;
+    text-decoration: none;
+}
+.chip b { margin-left: 4px; color: #6c757d; }
+.chip:hover { border-color: #102945; }
+.chip.activo { background-color: #102945; border-color: #102945; color: #fff; }
+.chip.activo b { color: #cecece; }
+
+.ver-mas { margin-top: 12px; }
+.ver-mas a { color: #0d6efd; }
+
+/* ---------- Catálogo ---------- */
+.categoria-regla { color: #6c757d; font-size: 14px; margin-bottom: 12px; }
+.categoria-regla strong { color: #212529; }
+.catalogo-lista { list-style: none; display: flex; flex-direction: column; }
+.catalogo-lista li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid #e9ecef;
+}
+.catalogo-lista small { color: #6c757d; margin-left: 6px; }
+.badge-equipo-disponible { background-color: #d1e7dd; color: #0f5132; }
+.badge-equipo-prestado { background-color: #fff3cd; color: #664d03; }
+.badge-equipo-mantenimiento { background-color: #e2e3e5; color: #41464b; }
+
+/* ---------- Reglas ---------- */
+.reglas-lista { margin-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+/* ---------- Mi cuenta: campos de contraseña ---------- */
+.form-solicitud .campo { max-width: 420px; }

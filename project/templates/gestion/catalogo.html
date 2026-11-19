@@ -1,0 +1,49 @@
+{% extends 'gestion/base_solicitante.html' %}
+
+{% block title %}Catálogo de equipos - Sistema{% endblock %}
+
+{% block content %}
+<div class="panel-wrapper">
+
+    <header class="panel-header">
+        <div>
+            <h1>Catálogo de equipos</h1>
+            <p>Lo que hay en el inventario y su disponibilidad ahora</p>
+        </div>
+        <div class="panel-actions">
+            {% if tiene_adeudos %}
+            <span class="btn-primary btn-disabled" aria-disabled="true">+ Solicitar equipo</span>
+            {% else %}
+            <a href="{% url 'solicitar_equipo' %}" class="btn-primary">+ Solicitar equipo</a>
+            {% endif %}
+        </div>
+    </header>
+
+    {% for categoria in categorias %}
+    <section class="panel-card">
+        <h2>{{ categoria.nombre }}</h2>
+        <p class="categoria-regla">
+            {% if categoria.por_horas %}
+            Por horas: hasta {{ max_horas }} h, el mismo día, de {{ apertura }}:00 a {{ cierre }}:00.
+            {% else %}
+            Por días: hasta {{ max_dias }} días.
+            {% endif %}
+            <strong>{{ categoria.disponibles }} de {{ categoria.lista|length }} disponibles.</strong>
+        </p>
+        <ul class="catalogo-lista">
+            {% for equipo in categoria.lista %}
+            <li>
+                <span><b>{{ equipo.nombre }}</b> <small>{{ equipo.codigo_inventario }}</small></span>
+                <span class="badge badge-equipo-{{ equipo.estado }}">{{ equipo.get_estado_display }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% empty %}
+    <section class="panel-card">
+        <p class="empty">Todavía no hay equipo registrado en el inventario.</p>
+    </section>
+    {% endfor %}
+
+</div>
+{% endblock %}

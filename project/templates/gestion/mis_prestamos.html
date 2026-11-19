@@ -1,0 +1,32 @@
+{% extends 'gestion/base_solicitante.html' %}
+
+{% block title %}Mis préstamos - Sistema{% endblock %}
+
+{% block content %}
+<div class="panel-wrapper">
+
+    <header class="panel-header">
+        <div>
+            <h1>Mis préstamos</h1>
+            <p>Solicitudes, entregas y devoluciones</p>
+        </div>
+    </header>
+
+    {% include 'gestion/_mensajes.html' %}
+
+    <section class="panel-card">
+        <nav class="chips" aria-label="Filtrar por estado">
+            {% for clave, texto, total in filtros %}
+            <a href="?estado={{ clave }}" class="chip{% if clave == filtro %} activo{% endif %}">{{ texto }} <b>{{ total }}</b></a>
+            {% endfor %}
+        </nav>
+
+        {% if prestamos %}
+        {% include 'gestion/_tabla_prestamos.html' %}
+        {% else %}
+        <p class="empty">No hay préstamos en esta vista.</p>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

@@ -289,3 +289,95 @@ class IncidenteTests(BaseTest):
         r = self.client.get(reverse('enc-inci'))
         self.assertContains(r, 'datos-incidentes')
         self.assertContains(r, 'Rayadura')
+
+
+class MenuSolicitanteTests(BaseTest):
+    PAGINAS = ('panel_solicitante', 'solicitar_equipo', 'mis_prestamos', 'catalogo',
+               'mis_adeudos', 'reglas', 'mi_cuenta')
+
+    def test_todas_las_pestanas_cargan_con_la_barra_lateral(self):
+        crear_equipo('LAP-1')
+        self.entrar(self.alumno)
+        for nombre in self.PAGINAS:
+            with self.subTest(nombre):
+                r = self.client.get(reverse(nombre))
+                self.assertEqual(r.status_code, 200)
+                self.assertContains(r, 'id="menu-lateral"')
+                self.assertContains(r, 'styles-sidebar.css')
+                self.assertContains(r, 'styles-solicitante.css')
+                self.assertNotContains(r, 'styles-encargado.css')
+
+    def test_la_pestana_activa_se_marca(self):
+        self.entrar(self.alumno)
+        html = self.client.get(reverse('catalogo')).content.decode()
+        self.assertEqual(html.count('aside-nav-select'), 1)
+        self.assertIn(f'href="{reverse("catalogo")}" class="aside-nav-select"', html)
+
+    def test_las_pestanas_exigen_sesion_y_rol(self):
+        for nombre in self.PAGINAS:
+            with self.subTest(nombre):
+                self.assertEqual(self.client.get(reverse(nombre)).status_code, 302)  # anónimo
+        self.entrar(self.encargado)
+        for nombre in self.PAGINAS:
+            with self.subTest(nombre):
+                self.assertRedirects(self.client.get(reverse(nombre)), reverse('index'))
+
+    def test_el_encargado_usa_su_css_y_la_misma_barra(self):
+        self.entrar(self.encargado)
+        r = self.client.get(reverse('enc-dash'))
+        self.assertContains(r, 'styles-sidebar.css')
+        self.assertContains(r, 'styles-encargado.css')
+        self.assertNotContains(r, 'styles-solicitante.css')
+
+    def test_aviso_de_adeudos_en_el_menu(self):
+        equipo = crear_equipo('LAP-1')
+        self.entrar(self.alumno)
+        self.assertNotContains(self.client.get(reverse('reglas')), 'aside-aviso')
+        vencido = Prestamo.objects.create(
+            solicitante=self.alumno, estado=Prestamo.ACTIVO, fecha_limite=timezone.now() - timedelta(days=2))
+        DetallePrestamo.objects.create(prestamo=vencido, equipo=equipo)
+        self.assertContains(self.client.get(reverse('reglas')), 'aside-aviso')
+
+    def test_mis_prestamos_filtra_por_estado(self):
+        e1, e2 = crear_equipo('LAP-1'), crear_equipo('LAP-2')
+        pendiente = Prestamo.objects.create(solicitante=self.alumno, fecha_limite=timezone.now() + timedelta(days=1))
+        DetallePrestamo.objects.create(prestamo=pendiente, equipo=e1)
+        devuelto = Prestamo.objects.create(
+            solicitante=self.alumno, estado=Prestamo.DEVUELTO, fecha_limite=timezone.now())
+        DetallePrestamo.objects.create(prestamo=devuelto, equipo=e2)
+        ajeno = Prestamo.objects.create(solicitante=self.otro, fecha_limite=timezone.now() + timedelta(days=1))
+        DetallePrestamo.objects.create(prestamo=ajeno, equipo=e1)
+
+        self.entrar(self.alumno)
+        todos = self.client.get(reverse('mis_prestamos'))
+        self.assertEqual(len(todos.context['prestamos']), 2)  # no incluye préstamos de otros
+        solo = self.client.get(reverse('mis_prestamos'), {'estado': 'devuelto'})
+        self.assertEqual([p.pk for p in solo.context['prestamos']], [devuelto.pk])
+        raro = self.client.get(reverse('mis_prestamos'), {'estado': 'inventado'})
+        self.assertEqual(raro.context['filtro'], 'todos')
+
+    def test_catalogo_cuenta_disponibles(self):
+        crear_equipo('LAP-1')
+        ocupado = crear_equipo('LAP-2')
+        ocupado.estado = Equipo.PRESTADO
+        ocupado.save()
+        crear_equipo('LAP-3')
+        self.entrar(self.alumno)
+        categoria = self.client.get(reverse('catalogo')).context['categorias'][0]
+        self.assertEqual((categoria.disponibles, len(categoria.lista)), (2, 3))
+
+    def test_cambiar_contrasena(self):
+        self.entrar(self.alumno)
+        r = self.client.post(reverse('mi_cuenta'), {
+            'old_password': 'clave123', 'new_password1': 'Nueva-clave-987', 'new_password2': 'Nueva-clave-987'})
+        self.assertRedirects(r, reverse('mi_cuenta'))
+        self.alumno.refresh_from_db()
+        self.assertTrue(self.alumno.check_password('Nueva-clave-987'))
+        self.assertEqual(self.client.get(reverse('reglas')).status_code, 200)  # la sesión sigue abierta
+
+    def test_contrasena_actual_incorrecta(self):
+        self.entrar(self.alumno)
+        self.client.post(reverse('mi_cuenta'), {
+            'old_password': 'mala', 'new_password1': 'Nueva-clave-987', 'new_password2': 'Nueva-clave-987'})
+        self.alumno.refresh_from_db()
+        self.assertTrue(self.alumno.check_password('clave123'))

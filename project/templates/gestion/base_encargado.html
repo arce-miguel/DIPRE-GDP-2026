@@ -1,0 +1,17 @@
+{% extends 'gestion/base.html' %}
+{% load static %}
+
+{# Base de las páginas del encargado: CSS, cabecera y scripts propios del rol #}
+{% block style %}
+<link rel="stylesheet" href="{% static 'gestion/css/styles-sidebar.css' %}">
+<link rel="stylesheet" href="{% static 'gestion/css/styles-encargado.css' %}">
+{% endblock style %}
+
+{% block header_img %}
+{% include 'gestion/_cabecera_panel.html' %}
+{% endblock header_img %}
+
+{% block extra_js %}
+<script src="{% static 'gestion/js/sidebar.js' %}"></script>
+<script src="{% static 'gestion/js/main.js' %}"></script>
+{% endblock extra_js %}

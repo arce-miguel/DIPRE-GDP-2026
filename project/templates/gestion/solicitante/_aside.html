@@ -1,0 +1,41 @@
+{# Menú lateral del solicitante. La pestaña activa se deduce de la URL actual. #}
+{% with ruta=request.resolver_match.url_name %}
+<aside id="menu-lateral" class="closed">
+    <nav class="aside-nav">
+        <a href="{% url 'panel_solicitante' %}" class="{% if ruta == 'panel_solicitante' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if ruta == 'panel_solicitante' %}principal{% else %}principal2{% endif %}"></use></svg>
+            <span>Inicio</span>
+        </a>
+        <a href="{% url 'solicitar_equipo' %}" class="{% if ruta == 'solicitar_equipo' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if ruta == 'solicitar_equipo' %}solicitar2{% else %}solicitar{% endif %}"></use></svg>
+            <span>Solicitar</span>
+        </a>
+        <a href="{% url 'mis_prestamos' %}" class="{% if ruta == 'mis_prestamos' or ruta == 'detalle_prestamo' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if ruta == 'mis_prestamos' or ruta == 'detalle_prestamo' %}prestamos2{% else %}prestamos{% endif %}"></use></svg>
+            <span>Mis préstamos</span>
+        </a>
+        <a href="{% url 'catalogo' %}" class="{% if ruta == 'catalogo' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if ruta == 'catalogo' %}inventario2{% else %}inventario{% endif %}"></use></svg>
+            <span>Catálogo</span>
+        </a>
+        <a href="{% url 'mis_adeudos' %}" class="{% if ruta == 'mis_adeudos' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if ruta == 'mis_adeudos' %}adeudos2{% else %}adeudos{% endif %}"></use></svg>
+            <span>Mis adeudos</span>
+            {% if tiene_adeudos_menu %}<b class="aside-aviso" title="Tienes adeudos pendientes">!</b>{% endif %}
+        </a>
+        <a href="{% url 'reglas' %}" class="{% if ruta == 'reglas' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if ruta == 'reglas' %}reglas2{% else %}reglas{% endif %}"></use></svg>
+            <span>Reglas</span>
+        </a>
+        <a href="{% url 'mi_cuenta' %}" class="{% if ruta == 'mi_cuenta' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if ruta == 'mi_cuenta' %}usuario2{% else %}usuario{% endif %}"></use></svg>
+            <span>Mi cuenta</span>
+        </a>
+        <hr>
+        <a href="{% url 'logout' %}" class="aside-nav-otros">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#logout"></use></svg>
+            <span>Cerrar Sesión</span>
+        </a>
+    </nav>
+</aside>
+{% endwith %}

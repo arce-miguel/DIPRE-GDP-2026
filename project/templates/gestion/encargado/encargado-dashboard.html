@@ -1,15 +1,6 @@
-{% extends 'gestion/base.html' %}
+{% extends 'gestion/base_encargado.html' %}
 
-{% load static %}
 {% block title %}Principal - Encargado{% endblock %}
-
-{% block style %}
-<link rel="stylesheet" href="{% static 'gestion/css/styles-encargado.css' %}">
-{% endblock style %}
-
-{% block header_img %}
-{% include 'gestion/encargado/_cabecera.html' %}
-{% endblock header_img %}
 
 {% block layout %}
 <main class="main_dis">
@@ -133,7 +124,3 @@
 </main>
 {% include 'gestion/encargado/_modal_nuevo_prestamo.html' %}
 {% endblock layout %}
-
-{% block extra_js %}
-<script src="{% static 'gestion/js/main.js' %}"></script>
-{% endblock %}

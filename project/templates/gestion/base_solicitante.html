@@ -1,7 +1,27 @@
 {% extends 'gestion/base.html' %}
 {% load static %}
 
-{# Base de las páginas del estudiante: añade su propio CSS sobre el compartido #}
+{# Base de las páginas del estudiante: CSS, cabecera, barra lateral y scripts propios del rol #}
 {% block style %}
+<link rel="stylesheet" href="{% static 'gestion/css/styles-sidebar.css' %}">
 <link rel="stylesheet" href="{% static 'gestion/css/styles-solicitante.css' %}">
 {% endblock style %}
+
+{% block header_img %}
+{% include 'gestion/_cabecera_panel.html' %}
+{% endblock header_img %}
+
+{# Las páginas del estudiante solo llenan "content"; el <main> con el menú lateral lo pone esta base. #}
+{% block layout %}
+<main class="main_dis">
+    {% include 'gestion/solicitante/_aside.html' %}
+    <div class="sol-contenido">
+        {% block content %}
+        {% endblock %}
+    </div>
+</main>
+{% endblock layout %}
+
+{% block extra_js %}
+<script src="{% static 'gestion/js/sidebar.js' %}"></script>
+{% endblock extra_js %}
