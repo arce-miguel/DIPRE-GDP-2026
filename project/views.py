@@ -146,6 +146,9 @@ def solicitar_equipo(request):
         'max_equipos': settings.SOLICITUD_MAX_EQUIPOS,
         'max_horas': settings.SOLICITUD_MAX_HORAS,
         'max_dias': settings.SOLICITUD_MAX_DIAS,
+        'apertura': settings.HORARIO_SERVICIO[0],
+        'cierre': settings.HORARIO_SERVICIO[1],
+        'tolerancia': settings.TOLERANCIA_MINUTOS,
     })
 
 

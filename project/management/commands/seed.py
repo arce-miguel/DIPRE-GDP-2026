@@ -6,23 +6,32 @@ from django.utils import timezone
 
 from project.models import Categoria, DetallePrestamo, Equipo, Prestamo, Rol, Usuario
 
-PASSWORD = 'demo1234'
-SOLICITANTE_CORREO = 'solicitante@demo.local'
-SOLICITANTE_PASSWORD = PASSWORD
+PASSWORD = 'dipre123'
 # (correo, nombre, rol, matrícula, número de empleado)
+# Para entrar basta con la matrícula o el número de empleado: s01, e01, admin...
 USUARIOS = [
-    (SOLICITANTE_CORREO, 'Solicitante Demo', Rol.SOLICITANTE, 'DEMO0001', None),
-    ('ana@demo.local', 'Ana Pérez', Rol.SOLICITANTE, 'A01234', None),
-    ('luis@demo.local', 'Luis Ramírez', Rol.SOLICITANTE, 'A01877', None),
-    ('encargado@demo.local', 'Encargado Demo', Rol.ENCARGADO, None, 'ENC0001'),
-    ('admin@demo.local', 'Administrador Demo', Rol.ADMINISTRADOR, None, 'ADM0001'),
+    ('s01@demo.local', 'Solicitante 01', Rol.SOLICITANTE, 's01', None),
+    ('s02@demo.local', 'Solicitante 02', Rol.SOLICITANTE, 's02', None),
+    ('s03@demo.local', 'Solicitante 03', Rol.SOLICITANTE, 's03', None),
+    ('e01@demo.local', 'Encargado 01', Rol.ENCARGADO, None, 'e01'),
+    ('e02@demo.local', 'Encargado 02', Rol.ENCARGADO, None, 'e02'),
+    ('admin@demo.local', 'Administrador', Rol.ADMINISTRADOR, None, 'admin'),
 ]
 
+# (categoría, modalidad, prefijo del código, marca, modelo, cantidad)
+# El nombre que ve el usuario es "marca modelo"; en lo genérico la marca es el tipo (p. ej. "Cable HDMI").
 EQUIPOS = [
-    ('Laptop', Categoria.POR_DIAS, 'Dell', 'Latitude 3420', 3),
-    ('Cámara', Categoria.POR_DIAS, 'Canon', 'EOS T7', 2),
-    ('Proyector', Categoria.POR_HORAS, 'Epson', 'X49', 2),
-    ('Bocina', Categoria.POR_HORAS, 'JBL', 'Partybox 110', 2),
+    ('Laptop', Categoria.POR_DIAS, 'LAP', 'Dell', 'Latitude 3420', 3),
+    ('Proyector', Categoria.POR_HORAS, 'PRO', 'Epson', 'X49', 2),
+    ('Bocina', Categoria.POR_HORAS, 'BOC', 'JBL', 'Partybox 110', 2),
+    ('Cables', Categoria.POR_HORAS, 'HDMI', 'Cable', 'HDMI', 3),
+    ('Cables', Categoria.POR_HORAS, 'UTP', 'Cable', 'UTP', 3),
+    ('Cables', Categoria.POR_HORAS, 'AUX', 'Cable', 'Auxiliar 3.5 mm', 3),
+    ('Cables', Categoria.POR_HORAS, 'USBC', 'Cable', 'USB-C', 3),
+    ('Cables', Categoria.POR_HORAS, 'PON', 'Ponchadora', 'RJ45', 2),
+    ('Mouse', Categoria.POR_HORAS, 'MOU', 'Mouse', 'Genérico', 4),
+    ('Micrófono', Categoria.POR_HORAS, 'MIC', 'Micrófono', 'Genérico', 3),
+    ('Teclado', Categoria.POR_HORAS, 'TEC', 'Teclado', 'Genérico', 3),
 ]
 
 
@@ -36,19 +45,28 @@ class Command(BaseCommand):
         for nombre in (Rol.SOLICITANTE, Rol.ENCARGADO, Rol.ADMINISTRADOR):
             Rol.objects.get_or_create(nombre=nombre)
 
-        for categoria, modalidad, marca, modelo, cantidad in EQUIPOS:
+        for categoria, modalidad, prefijo, marca, modelo, cantidad in EQUIPOS:
             cat, _ = Categoria.objects.get_or_create(nombre=categoria, defaults={'modalidad': modalidad})
             for n in range(1, cantidad + 1):
                 Equipo.objects.get_or_create(
-                    codigo_inventario=f'{categoria[:3].upper()}-{n:03d}',
+                    codigo_inventario=f'{prefijo}-{n:03d}',
                     defaults={'categoria': cat, 'marca': marca, 'modelo': modelo},
                 )
 
         for correo, nombre, rol, matricula, num_empleado in USUARIOS:
-            if not Usuario.objects.filter(correo=correo).exists():
+            usuario = Usuario.objects.filter(correo=correo).first()
+            if usuario is None:
                 Usuario.objects.create_user(
                     correo, nombre, password=PASSWORD, rol=rol,
                     matricula=matricula, num_empleado=num_empleado)
+            else:
+                # Ya existe (de un seed anterior): se deja igual que la lista de arriba.
+                usuario.nombre = nombre
+                usuario.rol, _ = Rol.objects.get_or_create(nombre=rol)
+                usuario.matricula = matricula
+                usuario.num_empleado = num_empleado
+                usuario.set_password(PASSWORD)
+                usuario.save()
 
         self._prestamos_de_ejemplo()
 
@@ -59,9 +77,9 @@ class Command(BaseCommand):
         if Prestamo.objects.exists():
             return
         ahora = timezone.now()
-        encargado = Usuario.objects.get(correo='encargado@demo.local')
-        ana = Usuario.objects.get(correo='ana@demo.local')
-        luis = Usuario.objects.get(correo='luis@demo.local')
+        encargado = Usuario.objects.get(correo='e01@demo.local')
+        ana = Usuario.objects.get(correo='s01@demo.local')
+        luis = Usuario.objects.get(correo='s02@demo.local')
 
         laptop = Equipo.objects.get(codigo_inventario='LAP-001')
         prestamo = Prestamo.objects.create(
@@ -74,4 +92,4 @@ class Command(BaseCommand):
 
         solicitud = Prestamo.objects.create(
             solicitante=luis, fecha_limite=ahora + timedelta(days=2), motivo_tipo='practica')
-        DetallePrestamo.objects.create(prestamo=solicitud, equipo=Equipo.objects.get(codigo_inventario='CÁM-001'))
+        DetallePrestamo.objects.create(prestamo=solicitud, equipo=Equipo.objects.get(codigo_inventario='LAP-002'))

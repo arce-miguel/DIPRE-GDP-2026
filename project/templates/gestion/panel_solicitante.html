@@ -8,7 +8,7 @@
     <header class="panel-header">
         <div>
             <h1>Hola, {{ user.nombre }}</h1>
-            <p>{{ user.identificador }}</p>
+            <p>{% if user.matricula %}No. de control: {{ user.matricula }}{% else %}{{ user.identificador }}{% endif %}</p>
         </div>
         <div class="panel-actions">
             {% if tiene_adeudos %}

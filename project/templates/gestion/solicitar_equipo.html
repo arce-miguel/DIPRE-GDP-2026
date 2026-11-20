@@ -11,7 +11,7 @@
             <h1>Solicitar equipo</h1>
             <p>Elige hasta {{ max_equipos }} equipos disponibles y completa los datos de tu solicitud.</p>
         </div>
-        <a href="{% url 'panel_solicitante' %}" class="btn-primary">← Volver a mis préstamos</a>
+        <a href="{% url 'panel_solicitante' %}" class="btn-secundario btn-secundario-claro">← Volver a mis préstamos</a>
     </header>
 
     {% if tiene_adeudos %}
@@ -68,28 +68,44 @@
             {% for e in form.equipos.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
         </section>
 
-        <section class="panel-card paso">
+        <section class="panel-card paso paso-detalles">
             <h2><span class="paso-num">2</span> Detalles del préstamo</h2>
 
             <div class="campo">
                 <label for="{{ form.fecha_limite.id_for_label }}">{{ form.fecha_limite.label }}</label>
                 {{ form.fecha_limite }}
+                <p class="campo-ayuda">
+                    Por días: hasta {{ max_dias }} días. Por horas: máx. {{ max_horas }} h, el mismo día y dentro del horario de servicio ({{ apertura }}:00 a {{ cierre }}:00).
+                </p>
                 {% for e in form.fecha_limite.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
             </div>
 
-            <div class="campo">
-                <label for="{{ form.motivo_tipo.id_for_label }}">{{ form.motivo_tipo.label }}</label>
-                {{ form.motivo_tipo }}
-                {% for e in form.motivo_tipo.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
+            <div class="nota-tolerancia">
+                <strong>Tolerancia de {{ tolerancia }} minutos.</strong>
+                Si no devuelves el equipo a la fecha y hora indicada (más {{ tolerancia }} minutos de tolerancia), el préstamo se marca como <strong>vencido</strong>, queda pendiente de devolución y no podrás pedir otro equipo hasta devolverlo.
             </div>
+
+            <fieldset class="campo">
+                <legend>{{ form.motivo_tipo.label }}</legend>
+                <div class="motivos">
+                    {% for radio in form.motivo_tipo %}
+                    <label class="motivo-chip">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+                    {% endfor %}
+                </div>
+                {% for e in form.motivo_tipo.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
+            </fieldset>
 
             <div class="campo">
                 <label for="{{ form.motivo.id_for_label }}">{{ form.motivo.label }}</label>
                 {{ form.motivo }}
+                <p class="campo-ayuda">Obligatorio si eliges «Otro».</p>
                 {% for e in form.motivo.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
             </div>
 
-            <button type="submit" class="btn-primary" {% if tiene_adeudos %}disabled{% endif %}>Enviar solicitud</button>
+            <div class="acciones-form">
+                <button type="submit" class="btn-primary" {% if tiene_adeudos %}disabled{% endif %}>Enviar solicitud</button>
+                <a href="{% url 'panel_solicitante' %}" class="btn-secundario">Cancelar</a>
+            </div>
         </section>
     </form>
 

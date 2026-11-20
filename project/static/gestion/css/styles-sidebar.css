@@ -57,7 +57,7 @@
     width: 100%;
 }
 aside{
-    background-color: #c1c1c2;
+    background-color: #ebeef3;
     margin: 0%;
     height: 100%;
     width: 170px;
@@ -125,5 +125,5 @@ aside{
 }
 
 #menu-lateral.closed {
-    margin-left: -200px; 
+    margin-left: -170px; /* = ancho del aside; con -200 el contenido quedaba 30px cortado a la izquierda */
 }

@@ -75,17 +75,15 @@ Los nombres de la base y del usuario son los de `.env.example`; cámbialos si us
 
 ## Cuentas de ejemplo
 
-Con `seed_demo` se crean estas cuentas. Para entrar por tipo de acceso:
+Con `python manage.py seed` se crean (o se actualizan) estas cuentas. Todas usan la contraseña `dipre123`:
 
-| Tipo | Usuario | Correo |
-| --- | --- | --- |
-| Estudiante | `20210001` (Ana), `20210002` (Luis), `20210003` (Marta) | `ana@dipre.local`, `luis@dipre.local`, `marta@dipre.local` |
-| Encargado | `E001` | `encargado@dipre.local` |
-| Administrador | `A001` | `admin@dipre.local` |
+| Tipo | Usuario |
+| --- | --- |
+| Solicitante | `s01`, `s02`, `s03` |
+| Encargado | `e01`, `e02` |
+| Administrador | `admin` |
 
-La contraseña de las cuentas de ejemplo está en `project/management/commands/seed_demo.py`. Son solo para desarrollo local.
-
-Luis ya trae un préstamo vencido, así que sirve para ver cómo se bloquean las solicitudes.
+Son solo para desarrollo local. En una base vacía, `s01` trae un préstamo vencido (sirve para ver cómo se bloquean las solicitudes) y `s02` una solicitud pendiente.
 
 ## Gestión de datos
 

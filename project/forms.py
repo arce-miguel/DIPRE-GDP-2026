@@ -18,10 +18,14 @@ class SolicitudPrestamoForm(forms.Form):
         input_formats=['%Y-%m-%dT%H:%M'],
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
     )
-    motivo_tipo = forms.ChoiceField(label='Motivo', choices=Prestamo.MOTIVOS)
+    motivo_tipo = forms.ChoiceField(
+        label='Motivo de la solicitud', choices=Prestamo.MOTIVOS,
+        widget=forms.RadioSelect,
+        error_messages={'required': 'Elige el motivo de la solicitud.'},
+    )
     motivo = forms.CharField(
-        label='Detalle del motivo', required=False, max_length=500,
-        widget=forms.Textarea(attrs={'rows': 3}),
+        label='Detalles (opcional)', required=False, max_length=500,
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Ej. Práctica de la materia de Redes'}),
     )
 
     def __init__(self, *args, solicitante, **kwargs):
