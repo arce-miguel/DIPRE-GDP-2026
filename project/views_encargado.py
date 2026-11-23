@@ -12,8 +12,8 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET, require_POST
 
 from . import services
-from .models import Bitacora, DetallePrestamo, Equipo, Incidencia, Prestamo, limite_de_vencimiento
-from .models import Categoria, DetallePrestamo, Equipo, Prestamo, Usuario
+from .models import (Bitacora, Categoria, DetallePrestamo, Equipo, Incidencia, Prestamo,
+                     limite_de_vencimiento)
 from .services import ErrorOperacion
 
 POR_VENCER_HORAS = 24  # un préstamo activo se marca "por vencer" dentro de este margen
@@ -344,8 +344,9 @@ def enc_incidente_resolver(request, pk):
         messages.success(request, 'Incidente actualizado.')
     return redirect('enc-inci')
 
-# --- VENCIDOS -------------------------------------------------------------
+# --- Vencidos ---------------------------------------------------------------
 
+@encargado_required
 def enc_vencidos(request):
     ahora = timezone.now()
     
@@ -384,34 +385,9 @@ def enc_vencidos(request):
         'total_vencidos': len(detalles),
     })
 
-# --- INvENTARIO -------------------------------------------------------------
-def enc_vencidos(request):
-    ahora = timezone.now()
-    detalles = (
-        DetallePrestamo.objects
-        .select_related('prestamo', 'prestamo__solicitante', 'equipo')
-        .filter(
-            fecha_devolucion__isnull=True,
-            prestamo__estado=Prestamo.ACTIVO,
-            prestamo__fecha_limite__lt=ahora,
-        )
-        .order_by('prestamo__fecha_limite')
-    )
+# --- Inventario -------------------------------------------------------------
 
-    for d in detalles:
-        dias = (ahora - d.prestamo.fecha_limite).days
-        texto = f"{dias} día{'s' if dias != 1 else ''}" if dias >= 1 else f"{max(1, (ahora - d.prestamo.fecha_limite).seconds // 3600)} h"
-        d.clave = d.css = 'vencido'
-        d.etiqueta = d.atraso = texto
-        d.vencido = True
-        d.busqueda = f"{d.prestamo.solicitante.nombre} {d.prestamo.solicitante.identificador} {d.equipo.nombre} {d.equipo.codigo_inventario}".lower()
-
-    return render(request, 'gestion/encargado/encargado-vencidos.html', {
-        'detalles': detalles,
-        'total_vencidos': len(detalles),
-    })
-
-
+@encargado_required
 def enc_inventario(request):
     if request.method == 'POST':
         equipo_id = request.POST.get('equipo_id', '').strip()
@@ -438,8 +414,9 @@ def enc_inventario(request):
                     elif estado != Equipo.BAJA:
                         eq.razon_baja = ''
                     eq.save()
+                    messages.success(request, 'Equipo actualizado.')
             else:
-                Equipo.objects.get_or_create(
+                _, creado = Equipo.objects.get_or_create(
                     codigo_inventario=codigo,
                     defaults={
                         'marca': marca,
@@ -447,6 +424,12 @@ def enc_inventario(request):
                         'categoria_id': int(cat_id),
                     }
                 )
+                if creado:
+                    messages.success(request, 'Equipo agregado al inventario.')
+                else:
+                    messages.error(request, 'Ya existe un equipo con ese código de inventario.')
+        else:
+            messages.error(request, 'Completa el nombre, el código y la categoría.')
         return redirect(request.path)
 
     equipos = Equipo.objects.select_related('categoria').all()
@@ -479,6 +462,8 @@ def enc_inventario(request):
         'categorias': Categoria.objects.all(),
     })
 
-# --- ADEUDOS -------------------------------------------------------------
+# --- Adeudos ----------------------------------------------------------------
+
+@encargado_required
 def enc_adeudos(request):
     return render(request, 'gestion/encargado/encargado-adeudos.html')

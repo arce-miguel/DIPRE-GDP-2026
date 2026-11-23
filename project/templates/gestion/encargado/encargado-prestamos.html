@@ -63,7 +63,7 @@
 
                                     {% for detalle in prestamo.detalles.all %}
                                     <p>
-                                        
+                                        <b>{{ detalle.equipo.nombre }}</b> · {{ detalle.equipo.codigo_inventario }}
                                         {% if detalle.devuelto %}
                                         — devuelto {{ detalle.fecha_devolucion|date:"d M" }} ({{ detalle.get_estado_devolucion_display }})
                                         {% elif prestamo.estado == 'activo' %}
