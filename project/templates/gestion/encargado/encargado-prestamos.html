@@ -50,7 +50,9 @@
                             </td>
                             <td>{{ prestamo.fecha_entrega|default:prestamo.fecha_solicitud|date:"d M" }}</td>
                             <td>{{ prestamo.fecha_limite|date:"d M H:i" }}</td>
-                            <td><span class="estado-{{ prestamo.css }}">{{ prestamo.etiqueta }}</span></td>
+                            <td>
+                                <span class="badge-estado estado-{{ prestamo.css }}">{{ prestamo.etiqueta }}</span>
+                            </td>
                         </tr>
                         <tr class="detalle" data-estado="{{ prestamo.clave }}" data-busqueda="{{ prestamo.busqueda }}">
                             <td colspan="5">
@@ -58,11 +60,10 @@
                                     <p><b>Solicitud:</b> #{{ prestamo.pk }}</p>
                                     <p><b>Motivo:</b> {{ prestamo.motivo_completo }}</p>
                                     {% if prestamo.observaciones %}<p><b>Observaciones:</b> {{ prestamo.observaciones }}</p>{% endif %}
-                                </div>
-                                <div class="detalle-contenido">
+
                                     {% for detalle in prestamo.detalles.all %}
                                     <p>
-                                        <b>{{ detalle.equipo.nombre }}</b> · {{ detalle.equipo.codigo_inventario }}
+                                        
                                         {% if detalle.devuelto %}
                                         — devuelto {{ detalle.fecha_devolucion|date:"d M" }} ({{ detalle.get_estado_devolucion_display }})
                                         {% elif prestamo.estado == 'activo' %}

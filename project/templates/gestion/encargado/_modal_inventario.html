@@ -1,0 +1,72 @@
+<div class="modal-inv-bg" id="modalInventario" hidden>
+    <div class="modal-inv-card">
+        <h3>Agregar equipo</h3>
+
+        <form method="post" action="{% url 'enc-inven' %}" id="formInventario" class="mi-form">
+            {% csrf_token %}
+
+            <div class="mi-campo">
+                <label for="miNombre">Nombre del equipo</label>
+                <input type="text" id="miNombre" name="nombre" placeholder="Ej. Laptop Dell Latitude" required autocomplete="off">
+            </div>
+
+            <div class="mi-campo">
+                <label for="miCodigo">Código</label>
+                <input type="text" id="miCodigo" name="codigo_inventario" placeholder="Ej. LAP-014" required autocomplete="off">
+            </div>
+
+            <div class="mi-campo">
+                <label for="miCategoria">Categoría</label>
+                <select id="miCategoria" name="categoria" required>
+                    {% for cat in categorias %}
+                        <option value="{{ cat.pk }}">{{ cat.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mi-footer">
+                <button type="button" class="btnPrestamo-Nuevo alt" id="miCancelar">Cancelar</button>
+                <button type="submit" class="btnPrestamo-Nuevo mi-btn-guardar" id="miGuardar" disabled>Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Editar Equipo -->
+<div class="modal-bg" id="modal-editar-equipo" hidden>
+    <div class="modal-card">
+        <h3>Editar equipo</h3>
+
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="equipo_id" id="edit-inv-id">
+
+            <label>Nombre del equipo</label>
+            <input type="text" name="nombre" id="edit-inv-nombre" required autocomplete="off">
+
+            <label>Código</label>
+            <input type="text" name="codigo_inventario" id="edit-inv-codigo" required autocomplete="off">
+
+            <label>Categoría</label>
+            <select name="categoria" id="edit-inv-categoria" required>
+                {% for cat in categorias %}
+                    <option value="{{ cat.pk }}">{{ cat.nombre }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Estado</label>
+            <select name="estado" id="edit-inv-estado" required>
+                <option value="disponible">Disponible</option>
+                <option value="prestado">Prestado</option>
+                <option value="mantenimiento">En mantenimiento</option>
+                <option value="extraviado">Extraviado</option>
+                <option value="baja">Dado de baja</option>
+            </select>
+
+            <div class="modal-acciones">
+                <button type="button" class="btnPrestamo-Nuevo alt" data-cerrar="modal-editar-equipo">Cancelar</button>
+                <button type="submit" class="btnPrestamo-Nuevo">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>

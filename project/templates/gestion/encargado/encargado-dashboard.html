@@ -99,26 +99,28 @@
                     <svg class="icons"><use href="#incidentes2"></use></svg>Registra Incidente
                 </button>
             </div>
-            <div class="ED-subm">
-                <div class="titulo">
-                    <svg class="icons"><use href="#historial"></use></svg>
-                    <h2>ACTIVIDAD RECIENTE</h2>
-                </div>
-                {% for registro in actividad %}
-                <div class="medio">
-                    <div class="columna">
-                        <b>{{ registro.accion }}</b>
-                        <small>{{ registro.detalle }} - hace {{ registro.fecha_hora|timesince }}</small>
+                <div class="ED-subm">
+                    <div class="titulo">
+                        <svg class="icons"><use href="#historial"></use></svg>
+                        <h2>ACTIVIDAD RECIENTE</h2>
+                    </div>
+                    <div class="actividad-lista">
+                        {% for registro in actividad %}
+                        <div class="medio">
+                            <div class="columna">
+                                <b>{{ registro.accion }}</b>
+                                <small>{{ registro.detalle }} - hace {{ registro.fecha_hora|timesince }}</small>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="medio">
+                            <div class="columna">
+                                <small>Todavía no hay actividad.</small>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-                {% empty %}
-                <div class="medio">
-                    <div class="columna">
-                        <small>Todavía no hay actividad.</small>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
         </section>
     </section>
 </main>

@@ -47,7 +47,9 @@
                             </td>
                             <td>{{ detalle.prestamo.fecha_entrega|date:"d M" }}</td>
                             <td>{{ detalle.prestamo.fecha_limite|date:"d M H:i" }}</td>
-                            <td><span class="estado-{{ detalle.css }}">{{ detalle.etiqueta }}</span></td>
+                            <td>
+                                <span class="badge-estado estado-{{ detalle.css }}">{{ detalle.etiqueta }}</span>
+                            </td>
                             <td>
                                 {% if not detalle.devuelto %}
                                 <button type="button" class="btnPrestamo-Nuevo btn-devolver1"

@@ -1,0 +1,70 @@
+{% extends 'gestion/base_encargado.html' %}
+{% block title %}Inventario - Encargado{% endblock %}
+
+{% block layout %}
+<main class="main_dis">
+    {% include 'gestion/encargado/_aside.html' with activo='inventario' %}
+    <section class="EP-principal">
+        <div class="EP-menus">
+            <h1>Inventario</h1>
+            <button type="button" class="btnPrestamo-Nuevo" id="btnAgregarEquipo">+ Agregar equipo</button>
+        </div>
+        {% include 'gestion/_mensajes.html' %}
+        <section class="EP-menus-P">
+            <div class="EP-menus-P1">
+                <div class="EP-menus-btn">
+                    <button type="button" class="EP-menus-btn-u activo" data-filtro="todos">Todos <b>{{ conteos.todos }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="disponible">Disponibles <b>{{ conteos.disponible }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="prestado">Prestados <b>{{ conteos.prestado }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="mantenimiento">En mantenimiento <b>{{ conteos.mantenimiento }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="extraviado">Extraviados <b>{{ conteos.extraviado }}</b></button>
+                    <button type="button" class="EP-menus-btn-u" data-filtro="baja">Dados de baja <b>{{ conteos.baja }}</b></button>
+                </div>
+                <label class="EP-search">
+                    <input id="buscar-tabla" placeholder="Equipo, código o categoría" autocomplete="off">
+                </label>
+            </div>
+            <div class="tabla-scroll">
+                <table class="EP-table">
+                    <thead>
+                        <tr>
+                            <th>Equipo</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Detalle</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in equipos %}
+                        <tr class="EP-tr-s" data-estado="{{ eq.clave }}" data-busqueda="{{ eq.busqueda }}">
+                            <td class="EP-table-td">
+                                <b>{{ eq.nombre }}</b>
+                                <small>{{ eq.codigo_inventario }}</small>
+                            </td>
+                            <td>{{ eq.categoria.nombre }}</td>
+                            <td>
+                                <span class="badge-estado estado-{{ eq.clave }}">{{ eq.etiqueta }}</span>
+                            </td>
+                            <td>{{ eq.detalle_texto }}</td>
+                            <td>
+                                <button type="button" class="btnPrestamo-Nuevo btn-editar-equipo"
+                                        data-id="{{ eq.pk }}"
+                                        data-nombre="{{ eq.nombre }}"
+                                        data-codigo="{{ eq.codigo_inventario }}"
+                                        data-categoria="{{ eq.categoria_id }}"
+                                        data-estado="{{ eq.clave }}">Editar</button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">No hay equipos registrados todavía.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+</main>
+
+{% include 'gestion/encargado/_modal_inventario.html' %}
+{% endblock layout %}

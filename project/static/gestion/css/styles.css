@@ -265,8 +265,29 @@ footer {
     background-color: #e9ecef;
     color: #212529;
 }
+.aviso1 {
+    position: fixed;
+    top: 75px;          /* Debajo de la barra superior */
+    right: 25px;        /* Pegado a la esquina derecha */
+    z-index: 9999;      /* Por encima de las tarjetas */
+    max-width: 380px;   /* Evita que se estire demasiado */
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    background-color: #e9ecef;
+    color: #212529;
+    animation: ocultarAviso 0.5s ease 4s forwards; /* Desaparece solo a los 4 segundos */
+}
 
+@keyframes ocultarAviso {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
 .aviso ul { margin: 8px 0 0 20px; }
 .aviso-error { background-color: #f8d7da; color: #842029; }
 .aviso-success { background-color: #d1e7dd; color: #0f5132; }
 .aviso-warning { background-color: #fff3cd; color: #664d03; }
+
+

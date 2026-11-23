@@ -17,16 +17,16 @@
             <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'incidentes' %}incidentes2{% else %}incidentes{% endif %}"></use></svg>
             <span>Incidentes</span>
         </a>
-        <a href="#" class="aside-nav-otros">
-            <svg class="icons" viewBox="0 0 48 48"><use href="#vencidos"></use></svg>
+        <a href="{% url 'enc-ven' %}" class="{% if activo == 'vencidos' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'vencidos' %}vencidos2{% else %}vencidos{% endif %}"></use></svg>
             <span> Vencidos </span>
         </a>
-        <a href="#" class="aside-nav-otros">
-            <svg class="icons" viewBox="0 0 48 48"><use href="#inventario"></use></svg>
+         <a href="{% url 'enc-inven' %}" class="{% if activo == 'inventario' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'inventario' %}inventario2{% else %}inventario{% endif %}"></use></svg>
             <span>Inventario</span>
         </a>
-        <a href="#" class="aside-nav-otros">
-            <svg class="icons" viewBox="0 0 48 48"><use href="#adeudos"></use></svg>
+         <a href="{% url 'enc-adeu' %}" class="{% if activo == 'adeudos' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'adeudos' %}adeudos2{% else %}adeudos{% endif %}"></use></svg>
             <span>Adeudos</span>
         </a>
         <a href="#" class="aside-nav-otros">

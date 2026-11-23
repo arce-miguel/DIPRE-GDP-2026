@@ -451,3 +451,105 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dibujar();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modalContactar');
+    if (!modal) return;
+
+    const titulo = document.getElementById('mcTitulo');
+    const equipoEl = document.getElementById('mcEquipo');
+    const subtituloEl = document.getElementById('mcSubtitulo');
+    const mensajeEl = document.getElementById('mcMensaje');
+    const btnCorreo = document.getElementById('mcBtnCorreo');
+    const correoTexto = document.getElementById('mcCorreoTexto');
+    const btnCopiar = document.getElementById('mcCopiar');
+
+    function actualizarMailto() {
+        const correo = btnCorreo.dataset.correo || '';
+        const asunto = encodeURIComponent('Recordatorio de devolución de equipo - DIPRE');
+        const cuerpo = encodeURIComponent(mensajeEl.value);
+        btnCorreo.href = `mailto:${correo}?subject=${asunto}&body=${cuerpo}`;
+    }
+
+document.querySelectorAll('.btn-contactar').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita que el clic active el evento de la fila <tr>
+
+            const { nombre, matricula, correo, equipo, codigo, limite, retraso } = btn.dataset;
+            const primerNombre = nombre.split(' ')[0];
+
+            titulo.textContent = `Contactar a ${nombre}`;
+            equipoEl.textContent = `${equipo} · ${codigo}`;
+            subtituloEl.textContent = `${matricula} · ${retraso}`;
+            correoTexto.textContent = correo || 'Sin correo registrado';
+            btnCorreo.dataset.correo = correo || '';
+
+            mensajeEl.value = `Hola ${primerNombre}, te escribimos del área de préstamos de equipo. Tu préstamo de ${equipo} (${codigo}) venció el ${limite} (${retraso}). Por favor devuélvelo lo antes posible. Gracias.`;
+
+            actualizarMailto();
+            modal.hidden = false;
+        });
+    });
+
+    mensajeEl.addEventListener('input', actualizarMailto);
+
+    btnCopiar.addEventListener('click', () => {
+        navigator.clipboard.writeText(mensajeEl.value);
+        btnCopiar.textContent = '¡Copiado!';
+        setTimeout(() => btnCopiar.textContent = 'Copiar mensaje', 2000);
+    });
+
+    document.getElementById('mcCerrar').addEventListener('click', () => modal.hidden = true);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.hidden = true; });
+});
+//modal de inventario o algo asi
+// --- Modal Agregar Equipo (Inventario) ---
+const modalInventario = document.getElementById('modalInventario');
+const btnAgregarEquipo = document.getElementById('btnAgregarEquipo');
+
+if (modalInventario && btnAgregarEquipo) {
+    const formInventario = document.getElementById('formInventario');
+    const miNombre = document.getElementById('miNombre');
+    const miCodigo = document.getElementById('miCodigo');
+    const miCancelar = document.getElementById('miCancelar');
+    const miGuardar = document.getElementById('miGuardar');
+
+    const validarInventario = () => {
+        miGuardar.disabled = !(miNombre.value.trim() && miCodigo.value.trim());
+    };
+
+    btnAgregarEquipo.addEventListener('click', () => {
+        formInventario.reset();
+        validarInventario();
+        modalInventario.hidden = false;
+        miNombre.focus();
+    });
+
+    miNombre.addEventListener('input', validarInventario);
+    miCodigo.addEventListener('input', validarInventario);
+    miCancelar.addEventListener('click', () => modalInventario.hidden = true);
+    modalInventario.addEventListener('click', (e) => {
+        if (e.target === modalInventario) modalInventario.hidden = true;
+    });
+}
+const modalEditEq = document.getElementById('modal-editar-equipo');
+
+if (modalEditEq) {
+    document.addEventListener('click', (e) => {
+        const btnEditar = e.target.closest('.btn-editar-equipo');
+        if (btnEditar) {
+            document.getElementById('edit-inv-id').value = btnEditar.dataset.id;
+            document.getElementById('edit-inv-nombre').value = btnEditar.dataset.nombre;
+            document.getElementById('edit-inv-codigo').value = btnEditar.dataset.codigo;
+            document.getElementById('edit-inv-categoria').value = btnEditar.dataset.categoria;
+            document.getElementById('edit-inv-estado').value = btnEditar.dataset.estado;
+            modalEditEq.hidden = false;
+            document.getElementById('edit-inv-nombre').focus();
+            return;
+        }
+
+        if (e.target === modalEditEq || e.target.closest('[data-cerrar="modal-editar-equipo"]')) {
+            modalEditEq.hidden = true;
+        }
+    });
+}

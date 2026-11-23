@@ -13,6 +13,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from . import services
 from .models import Bitacora, DetallePrestamo, Equipo, Incidencia, Prestamo, limite_de_vencimiento
+from .models import Categoria, DetallePrestamo, Equipo, Prestamo, Usuario
 from .services import ErrorOperacion
 
 POR_VENCER_HORAS = 24  # un préstamo activo se marca "por vencer" dentro de este margen
@@ -342,3 +343,142 @@ def enc_incidente_resolver(request, pk):
     else:
         messages.success(request, 'Incidente actualizado.')
     return redirect('enc-inci')
+
+# --- VENCIDOS -------------------------------------------------------------
+
+def enc_vencidos(request):
+    ahora = timezone.now()
+    
+    # Filtra los equipos entregados (activos), no devueltos y cuya fecha límite ya venció
+    detalles_qs = (
+        DetallePrestamo.objects
+        .select_related('prestamo', 'prestamo__solicitante', 'equipo')
+        .filter(
+            fecha_devolucion__isnull=True,
+            prestamo__estado='activo',
+            prestamo__fecha_limite__lt=ahora
+        )
+        .order_by('prestamo__fecha_limite')
+    )
+    detalles = []
+    for d in detalles_qs:
+        diferencia = ahora - d.prestamo.fecha_limite
+        dias = diferencia.days
+
+        if dias >= 1:
+            texto_retraso = f"{dias} día" if dias == 1 else f"{dias} días"
+        else:
+            horas = max(1, diferencia.seconds // 3600)
+            texto_retraso = f"{horas} hora" if horas == 1 else f"{horas} horas"
+
+        d.clave = 'vencido'
+        d.css = 'vencido'
+        d.etiqueta = texto_retraso
+        d.atraso = texto_retraso
+        d.vencido = True
+        d.busqueda = f"{d.prestamo.solicitante.nombre} {d.prestamo.solicitante.identificador} {d.equipo.nombre} {d.equipo.codigo_inventario}".lower()
+        detalles.append(d)
+
+    return render(request, 'gestion/encargado/encargado-vencidos.html', {
+        'detalles': detalles,
+        'total_vencidos': len(detalles),
+    })
+
+# --- INvENTARIO -------------------------------------------------------------
+def enc_vencidos(request):
+    ahora = timezone.now()
+    detalles = (
+        DetallePrestamo.objects
+        .select_related('prestamo', 'prestamo__solicitante', 'equipo')
+        .filter(
+            fecha_devolucion__isnull=True,
+            prestamo__estado=Prestamo.ACTIVO,
+            prestamo__fecha_limite__lt=ahora,
+        )
+        .order_by('prestamo__fecha_limite')
+    )
+
+    for d in detalles:
+        dias = (ahora - d.prestamo.fecha_limite).days
+        texto = f"{dias} día{'s' if dias != 1 else ''}" if dias >= 1 else f"{max(1, (ahora - d.prestamo.fecha_limite).seconds // 3600)} h"
+        d.clave = d.css = 'vencido'
+        d.etiqueta = d.atraso = texto
+        d.vencido = True
+        d.busqueda = f"{d.prestamo.solicitante.nombre} {d.prestamo.solicitante.identificador} {d.equipo.nombre} {d.equipo.codigo_inventario}".lower()
+
+    return render(request, 'gestion/encargado/encargado-vencidos.html', {
+        'detalles': detalles,
+        'total_vencidos': len(detalles),
+    })
+
+
+def enc_inventario(request):
+    if request.method == 'POST':
+        equipo_id = request.POST.get('equipo_id', '').strip()
+        nombre = request.POST.get('nombre', '').strip()
+        codigo = request.POST.get('codigo_inventario', '').strip()
+        cat_id = request.POST.get('categoria', '').strip()
+        estado = request.POST.get('estado', Equipo.DISPONIBLE).strip()
+
+        if nombre and codigo and cat_id.isdigit():
+            partes = nombre.split(' ', 1)
+            marca = partes[0]
+            modelo = partes[1] if len(partes) > 1 else ''
+
+            if equipo_id.isdigit():
+                eq = Equipo.objects.filter(pk=int(equipo_id)).first()
+                if eq:
+                    eq.marca = marca
+                    eq.modelo = modelo
+                    eq.codigo_inventario = codigo
+                    eq.categoria_id = int(cat_id)
+                    eq.estado = estado
+                    if estado == Equipo.BAJA and not eq.razon_baja:
+                        eq.razon_baja = Equipo.RAZON_OBSOLETO
+                    elif estado != Equipo.BAJA:
+                        eq.razon_baja = ''
+                    eq.save()
+            else:
+                Equipo.objects.get_or_create(
+                    codigo_inventario=codigo,
+                    defaults={
+                        'marca': marca,
+                        'modelo': modelo,
+                        'categoria_id': int(cat_id),
+                    }
+                )
+        return redirect(request.path)
+
+    equipos = Equipo.objects.select_related('categoria').all()
+    activos = dict(
+        DetallePrestamo.objects
+        .filter(fecha_devolucion__isnull=True, prestamo__estado=Prestamo.ACTIVO)
+        .values_list('equipo_id', 'prestamo__solicitante__nombre')
+    )
+
+    conteos = {
+        'todos': 0,
+        'disponible': 0,
+        'prestado': 0,
+        'mantenimiento': 0,
+        'extraviado': 0,
+        'baja': 0,
+    }
+    for eq in equipos:
+        conteos['todos'] += 1
+        if eq.estado in conteos:
+            conteos[eq.estado] += 1
+        eq.clave = eq.estado
+        eq.etiqueta = eq.get_estado_display()
+        eq.detalle_texto = f"Con {activos[eq.pk]}" if eq.pk in activos else "—"
+        eq.busqueda = f"{eq.nombre} {eq.codigo_inventario} {eq.categoria.nombre}".lower()
+
+    return render(request, 'gestion/encargado/encargado-inventario.html', {
+        'equipos': equipos,
+        'conteos': conteos,
+        'categorias': Categoria.objects.all(),
+    })
+
+# --- ADEUDOS -------------------------------------------------------------
+def enc_adeudos(request):
+    return render(request, 'gestion/encargado/encargado-adeudos.html')
