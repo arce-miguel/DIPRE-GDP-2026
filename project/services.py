@@ -3,6 +3,9 @@
 Las vistas solo validan la petición y llaman aquí; así las reglas viven en un solo lugar,
 corren dentro de una transacción y dejan rastro en la bitácora.
 """
+from datetime import timedelta
+
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
@@ -10,9 +13,23 @@ from .models import (
     Bitacora, DetallePrestamo, Equipo, Incidencia, Prestamo, Rol, Usuario, limite_de_vencimiento,
 )
 
+PASO_MINUTOS = 15  # los préstamos por horas se piden en pasos de 15 minutos
+
 
 class ErrorOperacion(Exception):
-    """La operación no se puede realizar; el mensaje se muestra tal cual al encargado."""
+    """La operación no se puede realizar; el mensaje se muestra tal cual al usuario.
+
+    `campo` indica el campo del formulario al que pertenece el error (None si es general).
+    """
+
+    def __init__(self, mensaje, campo=None):
+        super().__init__(mensaje)
+        self.campo = campo
+
+
+def ahora():
+    """Hora local actual. Se aísla aquí para poder fijarla en las pruebas."""
+    return timezone.localtime()
 
 
 def registrar(usuario, accion, entidad='', id_registro=None, detalle='', tipo=Bitacora.OPERACION):
@@ -34,6 +51,79 @@ def buscar_solicitante(identificador):
 
 
 # --- Préstamos --------------------------------------------------------------
+
+def fecha_limite_de_solicitud(equipos, limite):
+    """Valida la fecha límite según la modalidad y la devuelve ya normalizada.
+
+    Por días: de mañana a SOLICITUD_MAX_DIAS días; el equipo se devuelve al cierre del día elegido.
+    Por horas: hoy, dentro del horario de servicio, hasta SOLICITUD_MAX_HORAS y en pasos de 15 minutos.
+    """
+    apertura, cierre = settings.HORARIO_SERVICIO
+    actual = ahora()
+    limite = timezone.localtime(limite)
+
+    if equipos[0].por_horas:
+        if limite <= actual:
+            raise ErrorOperacion('La hora de devolución debe ser futura.', 'fecha_limite')
+        if limite.date() != actual.date():
+            raise ErrorOperacion('Los equipos por horas se devuelven el mismo día.', 'fecha_limite')
+        if limite > actual + timedelta(hours=settings.SOLICITUD_MAX_HORAS):
+            raise ErrorOperacion(
+                f'El préstamo por horas no puede exceder {settings.SOLICITUD_MAX_HORAS} horas.', 'fecha_limite')
+        dentro = apertura * 60 <= limite.hour * 60 + limite.minute <= cierre * 60
+        abierto = apertura * 60 <= actual.hour * 60 + actual.minute <= cierre * 60
+        if not (dentro and abierto):
+            raise ErrorOperacion(
+                f'Fuera del horario de servicio ({apertura}:00 a {cierre}:00).', 'fecha_limite')
+        if limite.minute % PASO_MINUTOS:
+            raise ErrorOperacion(
+                f'La hora de devolución va en pasos de {PASO_MINUTOS} minutos.', 'fecha_limite')
+        return limite.replace(second=0, microsecond=0)
+
+    hoy = actual.date()
+    if limite.date() <= hoy:
+        raise ErrorOperacion('La devolución por días es a partir de mañana.', 'fecha_limite')
+    if limite.date() > hoy + timedelta(days=settings.SOLICITUD_MAX_DIAS):
+        raise ErrorOperacion(
+            f'El préstamo no puede exceder {settings.SOLICITUD_MAX_DIAS} días.', 'fecha_limite')
+    return limite.replace(hour=cierre, minute=0, second=0, microsecond=0)
+
+
+def validar_solicitud(solicitante, equipos, fecha_limite, motivo_tipo, motivo=''):
+    """Reglas de una solicitud del solicitante; devuelve la fecha límite normalizada."""
+    equipos = list(equipos)
+    if not equipos:
+        raise ErrorOperacion('Elige al menos un equipo.', 'equipos')
+    if len(equipos) > settings.SOLICITUD_MAX_EQUIPOS:
+        raise ErrorOperacion(
+            f'Puedes solicitar hasta {settings.SOLICITUD_MAX_EQUIPOS} equipos a la vez.', 'equipos')
+    if len({e.por_horas for e in equipos}) > 1:
+        raise ErrorOperacion(
+            'No puedes combinar equipos por horas con equipos por días en la misma solicitud.', 'equipos')
+    if solicitante.tiene_adeudos:
+        raise ErrorOperacion('Tienes adeudos pendientes y no puedes solicitar equipos.')
+    if motivo_tipo == Prestamo.MOTIVO_OTRO and not (motivo or '').strip():
+        raise ErrorOperacion('Describe el motivo de la solicitud.', 'motivo')
+    return fecha_limite_de_solicitud(equipos, fecha_limite)
+
+
+def solicitar_prestamo(solicitante, equipos, fecha_limite, motivo_tipo, motivo=''):
+    """Crea una solicitud pendiente; el encargado la aprueba (y ahí se bloquean los equipos)."""
+    equipos = list(equipos)
+    limite = validar_solicitud(solicitante, equipos, fecha_limite, motivo_tipo, motivo)
+    with transaction.atomic():
+        libres = Equipo.objects.select_for_update().filter(
+            pk__in=[e.pk for e in equipos], estado=Equipo.DISPONIBLE).count()
+        if libres != len(equipos):
+            raise ErrorOperacion('Alguno de los equipos elegidos ya no está disponible.', 'equipos')
+        prestamo = Prestamo.objects.create(
+            solicitante=solicitante, fecha_limite=limite, motivo_tipo=motivo_tipo,
+            motivo=(motivo or '').strip())
+        DetallePrestamo.objects.bulk_create(DetallePrestamo(prestamo=prestamo, equipo=e) for e in equipos)
+        registrar(solicitante, 'Solicitud de préstamo', 'prestamo', prestamo.pk,
+                  ', '.join(e.codigo_inventario for e in equipos))
+    return prestamo
+
 
 def crear_prestamo_directo(encargado, solicitante, equipo_id, fecha_limite, observaciones=''):
     """Préstamo en ventanilla: se aprueba y se entrega en el mismo momento."""

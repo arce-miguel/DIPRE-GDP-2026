@@ -25,8 +25,8 @@
     <section class="panel-card">
         <h2>Tiempos de préstamo</h2>
         <ul class="reglas-lista">
-            <li><b>Por días:</b> hasta {{ max_dias }} días.</li>
-            <li><b>Por horas:</b> hasta {{ max_horas }} horas, se devuelve el mismo día y dentro del horario de servicio ({{ apertura }}:00 a {{ cierre }}:00).</li>
+            <li><b>Por días:</b> de mañana a {{ max_dias }} días; se devuelve al cierre ({{ cierre }}:00) del día elegido.</li>
+            <li><b>Por horas:</b> hasta {{ max_horas }} horas, se pide y se devuelve el mismo día, dentro del horario de servicio ({{ apertura }}:00 a {{ cierre }}:00) y en pasos de 15 minutos.</li>
             <li>Hay <b>{{ tolerancia }} minutos de tolerancia</b> después de la fecha límite; pasado ese tiempo el préstamo se marca como vencido.</li>
         </ul>
     </section>

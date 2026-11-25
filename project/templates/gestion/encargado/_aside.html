@@ -29,10 +29,20 @@
             <svg class="icons" viewBox="0 0 48 48"><use href="#{% if activo == 'adeudos' %}adeudos2{% else %}adeudos{% endif %}"></use></svg>
             <span>Adeudos</span>
         </a>
-        <a href="#" class="aside-nav-otros">
+        <a href="{% url 'enc-historial' %}" class="{% if activo == 'historial' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
             <svg class="icons" viewBox="0 0 48 48"><use href="#historial"></use></svg>
             <span>Historial</span>
         </a>
+        {% if request.user.es_administrador %}
+        <a href="{% url 'adm-panel' %}" class="{% if activo == 'admin' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#principal2"></use></svg>
+            <span>Administración</span>
+        </a>
+        <a href="{% url 'adm-bitacora' %}" class="{% if activo == 'bitacora' %}aside-nav-select{% else %}aside-nav-otros{% endif %}">
+            <svg class="icons" viewBox="0 0 48 48"><use href="#incidentes"></use></svg>
+            <span>Bitácora</span>
+        </a>
+        {% endif %}
         <hr>
         <a href="{% url 'logout' %}" class="aside-nav-otros">
             <svg class="icons" viewBox="0 0 48 48"><use href="#logout"></use></svg>

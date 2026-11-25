@@ -1,11 +1,7 @@
-from datetime import timedelta
-
 from django import forms
-from django.conf import settings
-from django.db import transaction
-from django.utils import timezone
 
-from .models import DetallePrestamo, Equipo, Prestamo
+from . import services
+from .models import Equipo, Prestamo
 
 
 class SolicitudPrestamoForm(forms.Form):
@@ -16,7 +12,7 @@ class SolicitudPrestamoForm(forms.Form):
     fecha_limite = forms.DateTimeField(
         label='Fecha y hora de devolución',
         input_formats=['%Y-%m-%dT%H:%M'],
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local', 'step': 900}, format='%Y-%m-%dT%H:%M'),
     )
     motivo_tipo = forms.ChoiceField(
         label='Motivo de la solicitud', choices=Prestamo.MOTIVOS,
@@ -34,55 +30,25 @@ class SolicitudPrestamoForm(forms.Form):
         self.fields['equipos'].queryset = Equipo.objects.filter(
             estado=Equipo.DISPONIBLE).select_related('categoria')
 
-    def clean_equipos(self):
-        equipos = self.cleaned_data['equipos']
-        if len(equipos) > settings.SOLICITUD_MAX_EQUIPOS:
-            raise forms.ValidationError(
-                f'Puedes solicitar hasta {settings.SOLICITUD_MAX_EQUIPOS} equipos a la vez.')
-        if len({e.por_horas for e in equipos}) > 1:
-            raise forms.ValidationError(
-                'No puedes combinar equipos por horas con equipos por días en la misma solicitud.')
-        return equipos
-
     def clean(self):
         datos = super().clean()
-        if self.solicitante.tiene_adeudos:
-            raise forms.ValidationError('Tienes adeudos pendientes y no puedes solicitar equipos.')
-
         equipos = datos.get('equipos')
         limite = datos.get('fecha_limite')
-        if equipos and limite:
-            ahora = timezone.localtime()
-            limite = timezone.localtime(limite)
-            if limite <= ahora:
-                self.add_error('fecha_limite', 'La fecha de devolución debe ser futura.')
-            elif equipos[0].por_horas:
-                apertura, cierre = settings.HORARIO_SERVICIO
-                if limite.date() != ahora.date():
-                    self.add_error('fecha_limite', 'Los equipos por horas se devuelven el mismo día.')
-                elif limite > ahora + timedelta(hours=settings.SOLICITUD_MAX_HORAS):
-                    self.add_error(
-                        'fecha_limite', f'El préstamo por horas no puede exceder {settings.SOLICITUD_MAX_HORAS} horas.')
-                elif not apertura <= limite.hour < cierre:
-                    self.add_error(
-                        'fecha_limite', f'Fuera del horario de servicio ({apertura}:00 a {cierre}:00).')
-            elif limite > ahora + timedelta(days=settings.SOLICITUD_MAX_DIAS):
-                self.add_error(
-                    'fecha_limite', f'El préstamo no puede exceder {settings.SOLICITUD_MAX_DIAS} días.')
-
-        if datos.get('motivo_tipo') == Prestamo.MOTIVO_OTRO and not datos.get('motivo', '').strip():
-            self.add_error('motivo', 'Describe el motivo de la solicitud.')
+        motivo_tipo = datos.get('motivo_tipo')
+        try:
+            if equipos and limite and motivo_tipo:
+                datos['fecha_limite'] = services.validar_solicitud(
+                    self.solicitante, equipos, limite, motivo_tipo, datos.get('motivo', ''))
+            elif self.solicitante.tiene_adeudos:
+                raise services.ErrorOperacion('Tienes adeudos pendientes y no puedes solicitar equipos.')
+        except services.ErrorOperacion as error:
+            if error.campo:
+                self.add_error(error.campo, str(error))
+            else:
+                raise forms.ValidationError(str(error))
         return datos
 
     def guardar(self):
         datos = self.cleaned_data
-        with transaction.atomic():
-            prestamo = Prestamo.objects.create(
-                solicitante=self.solicitante,
-                fecha_limite=datos['fecha_limite'],
-                motivo_tipo=datos['motivo_tipo'],
-                motivo=datos['motivo'].strip(),
-            )
-            DetallePrestamo.objects.bulk_create(
-                DetallePrestamo(prestamo=prestamo, equipo=e) for e in datos['equipos'])
-        return prestamo
+        return services.solicitar_prestamo(
+            self.solicitante, datos['equipos'], datos['fecha_limite'], datos['motivo_tipo'], datos['motivo'])

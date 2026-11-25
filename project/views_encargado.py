@@ -19,17 +19,26 @@ from .services import ErrorOperacion
 POR_VENCER_HORAS = 24  # un préstamo activo se marca "por vencer" dentro de este margen
 
 
-def encargado_required(vista):
-    """Solo encargados (y administradores); a los demás los manda al acceso correspondiente."""
-    @wraps(vista)
-    def envoltura(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect_to_login(request.get_full_path(), reverse('login') + '?tipo=encargado')
-        if not request.user.es_encargado:
-            messages.error(request, 'Tu cuenta no tiene acceso al módulo del encargado.')
-            return redirect('index')
-        return vista(request, *args, **kwargs)
-    return envoltura
+def rol_requerido(permitido, tipo_login, mensaje):
+    """Fábrica de decoradores: sin sesión va al acceso `tipo_login`; con otro rol, al inicio."""
+    def decorador(vista):
+        @wraps(vista)
+        def envoltura(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                return redirect_to_login(request.get_full_path(), reverse('login') + f'?tipo={tipo_login}')
+            if not permitido(request.user):
+                messages.error(request, mensaje)
+                return redirect('index')
+            return vista(request, *args, **kwargs)
+        return envoltura
+    return decorador
+
+
+# Los encargados y también los administradores (heredan todo lo del encargado)
+encargado_required = rol_requerido(
+    lambda u: u.es_encargado, 'encargado', 'Tu cuenta no tiene acceso al módulo del encargado.')
+administrador_required = rol_requerido(
+    lambda u: u.es_administrador, 'ADMIN', 'Tu cuenta no tiene acceso al módulo del administrador.')
 
 
 def _volver(request, defecto):
@@ -342,7 +351,7 @@ def enc_incidente_resolver(request, pk):
         messages.error(request, str(error))
     else:
         messages.success(request, 'Incidente actualizado.')
-    return redirect('enc-inci')
+    return _volver(request, 'enc-inci')
 
 # --- Vencidos ---------------------------------------------------------------
 
@@ -357,7 +366,7 @@ def enc_vencidos(request):
         .filter(
             fecha_devolucion__isnull=True,
             prestamo__estado='activo',
-            prestamo__fecha_limite__lt=ahora
+            prestamo__fecha_limite__lt=limite_de_vencimiento()  # misma tolerancia que Prestamo.vencido
         )
         .order_by('prestamo__fecha_limite')
     )
@@ -466,4 +475,43 @@ def enc_inventario(request):
 
 @encargado_required
 def enc_adeudos(request):
-    return render(request, 'gestion/encargado/encargado-adeudos.html')
+    """Lo que debe cada solicitante: préstamos vencidos sin devolver y daños o pérdidas sin saldar."""
+    ahora = timezone.now()
+    adeudos = []
+
+    vencidos = (DetallePrestamo.objects
+                .select_related('prestamo__solicitante', 'equipo')
+                .filter(fecha_devolucion__isnull=True, prestamo__estado=Prestamo.ACTIVO,
+                        prestamo__fecha_limite__lt=limite_de_vencimiento()))
+    for detalle in vencidos:
+        adeudos.append({
+            'clave': 'vencido', 'concepto': 'Préstamo vencido',
+            'detalle': detalle, 'incidencia': None,
+            'solicitante': detalle.prestamo.solicitante, 'equipo': detalle.equipo,
+            'desde': detalle.prestamo.fecha_limite,
+            'nota': f'Retraso de {_atraso(detalle.prestamo.fecha_limite, ahora)}',
+        })
+
+    incidencias = (Incidencia.objects.con_adeudo_pendiente()
+                   .select_related('prestamo__solicitante', 'equipo'))
+    for incidencia in incidencias:
+        adeudos.append({
+            'clave': incidencia.tipo, 'concepto': incidencia.get_tipo_display(),
+            'detalle': None, 'incidencia': incidencia,
+            'solicitante': incidencia.prestamo.solicitante, 'equipo': incidencia.equipo,
+            'desde': incidencia.fecha, 'nota': incidencia.descripcion,
+        })
+
+    for adeudo in adeudos:
+        adeudo['busqueda'] = (
+            f"{adeudo['solicitante'].nombre} {adeudo['solicitante'].identificador} "
+            f"{adeudo['equipo'].nombre} {adeudo['equipo'].codigo_inventario}").lower()
+    adeudos.sort(key=lambda a: a['desde'])
+
+    return render(request, 'gestion/encargado/encargado-adeudos.html', {
+        'adeudos': adeudos,
+        'total_adeudos': len(adeudos),
+        'solicitantes_con_adeudo': len({a['solicitante'].pk for a in adeudos}),
+        'formas_saldo': Incidencia.FORMAS_SALDO,
+        'equipos_modal': [],
+    })

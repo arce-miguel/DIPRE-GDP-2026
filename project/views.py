@@ -61,7 +61,7 @@ MODULOS_LOGIN = {
         'subtitulo': 'Ingrese datos de administrador',
         'campo': 'Número de empleado',
         'permitido': lambda u: u.es_administrador,
-        'destino': 'admin:index',
+        'destino': 'adm-panel',
     },
 }
 
@@ -72,12 +72,17 @@ def login_todos(request):
     error = None
 
     if request.method == 'POST':
-        usuario = authenticate(
-            request, username=request.POST.get('username', ''), password=request.POST.get('password', ''))
+        identificador = request.POST.get('username', '').strip()
+        usuario = authenticate(request, username=identificador, password=request.POST.get('password', ''))
         if usuario is None:
             error = 'Número de control o contraseña incorrectos.'
+            # Nunca se guarda la contraseña, solo qué identificador se intentó y en qué módulo
+            registrar(None, 'Intento de acceso fallido', 'usuario', detalle=f'{identificador} · módulo {tipo}',
+                      tipo=Bitacora.ACCESO)
         elif not modulo['permitido'](usuario):
             error = 'Esta cuenta no tiene acceso a este módulo.'
+            registrar(usuario, 'Acceso denegado: rol incorrecto', 'usuario', usuario.pk,
+                      detalle=f'módulo {tipo}', tipo=Bitacora.ACCESO)
         else:
             login(request, usuario)
             registrar(usuario, 'Inicio de sesión', 'usuario', usuario.pk, tipo=Bitacora.ACCESO)
@@ -97,6 +102,8 @@ def login_todos(request):
 
 
 def cerrar_sesion(request):
+    if request.user.is_authenticated:
+        registrar(request.user, 'Cierre de sesión', 'usuario', request.user.pk, tipo=Bitacora.ACCESO)
     logout(request)
     return redirect('index')
 

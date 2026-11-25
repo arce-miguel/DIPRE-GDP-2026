@@ -57,7 +57,7 @@
                     <strong class="equipo-nombre">{{ e.nombre }}</strong>
                     <span class="equipo-codigo">Código {{ e.codigo_inventario }}</span>
                     <span class="equipo-regla">
-                        {% if e.por_horas %}Por horas · máx. {{ max_horas }} h, mismo día{% else %}Por días · hasta {{ max_dias }} días{% endif %}
+                        {% if e.por_horas %}Por horas · máx. {{ max_horas }} h, mismo día{% else %}Por días · de mañana a {{ max_dias }} días{% endif %}
                     </span>
                 </label>
                 {% empty %}
@@ -75,7 +75,7 @@
                 <label for="{{ form.fecha_limite.id_for_label }}">{{ form.fecha_limite.label }}</label>
                 {{ form.fecha_limite }}
                 <p class="campo-ayuda">
-                    Por días: hasta {{ max_dias }} días. Por horas: máx. {{ max_horas }} h, el mismo día y dentro del horario de servicio ({{ apertura }}:00 a {{ cierre }}:00).
+                    Por días: de mañana a {{ max_dias }} días; se devuelve al cierre ({{ cierre }}:00) del día elegido. Por horas: hoy, máx. {{ max_horas }} h, entre las {{ apertura }}:00 y las {{ cierre }}:00 y en pasos de 15 minutos.
                 </p>
                 {% for e in form.fecha_limite.errors %}<p class="campo-error">{{ e }}</p>{% endfor %}
             </div>

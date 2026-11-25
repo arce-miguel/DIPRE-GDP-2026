@@ -1,0 +1,50 @@
+{% extends 'gestion/base_encargado.html' %}
+{% block title %}Administración - DIPRE{% endblock %}
+
+{% block layout %}
+<main class="main_dis">
+    {% include 'gestion/encargado/_aside.html' with activo='admin' %}
+    <section class="EP-principal">
+        <div class="EP-menus">
+            <h1>Administración</h1>
+            <a class="btnPrestamo-Nuevo" href="{% url 'admin:index' %}">Usuarios, equipos y categorías</a>
+        </div>
+        {% include 'gestion/_mensajes.html' %}
+
+        <section class="adm-grupos">
+            {% for grupo, datos in estadisticas.items %}
+            <div class="adm-tarjeta">
+                <h2>{{ grupo|capfirst }}</h2>
+                <dl>
+                    {% for etiqueta, valor in datos.items %}
+                    <div><dt>{{ etiqueta }}</dt><dd>{{ valor }}</dd></div>
+                    {% endfor %}
+                </dl>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section class="EP-menus-P">
+            <h2>Últimos accesos</h2>
+            <div class="tabla-scroll">
+                <table class="EP-table">
+                    <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead>
+                    <tbody>
+                        {% for registro in accesos %}
+                        <tr>
+                            <td>{{ registro.fecha_hora|date:"d/m/Y H:i" }}</td>
+                            <td>{{ registro.usuario.nombre|default:"—" }}</td>
+                            <td>{{ registro.accion }}</td>
+                            <td>{{ registro.detalle|default:"" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">Todavía no hay accesos.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p><a href="{% url 'adm-bitacora' %}">Ver la bitácora completa →</a></p>
+        </section>
+    </section>
+</main>
+{% endblock layout %}

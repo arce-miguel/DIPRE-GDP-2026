@@ -1,9 +1,12 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
+from unittest import mock
 
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from . import services
+from .forms import SolicitudPrestamoForm
 from .models import (
     Bitacora, Categoria, DetallePrestamo, Equipo, Incidencia, Prestamo, Rol, Usuario,
 )
@@ -381,3 +384,233 @@ class MenuSolicitanteTests(BaseTest):
             'old_password': 'mala', 'new_password1': 'Nueva-clave-987', 'new_password2': 'Nueva-clave-987'})
         self.alumno.refresh_from_db()
         self.assertTrue(self.alumno.check_password('clave123'))
+
+
+class BitacoraDeAccesosTests(BaseTest):
+    def test_intento_fallido_queda_en_la_bitacora_sin_la_contrasena(self):
+        self.client.post(reverse('login'), {'username': 'A01234', 'password': 'secreta-mala'})
+        registro = Bitacora.objects.get(tipo=Bitacora.ACCESO, accion='Intento de acceso fallido')
+        self.assertIn('A01234', registro.detalle)
+        self.assertNotIn('secreta-mala', registro.detalle)
+
+    def test_rol_incorrecto_queda_en_la_bitacora(self):
+        self.client.post(reverse('login') + '?tipo=encargado', {'username': 'A01234', 'password': 'clave123'})
+        self.assertTrue(Bitacora.objects.filter(
+            tipo=Bitacora.ACCESO, usuario=self.alumno, accion__startswith='Acceso denegado').exists())
+
+    def test_cierre_de_sesion_queda_en_la_bitacora(self):
+        self.entrar(self.alumno)
+        self.client.get(reverse('logout'))
+        self.assertTrue(Bitacora.objects.filter(
+            tipo=Bitacora.ACCESO, usuario=self.alumno, accion='Cierre de sesión').exists())
+
+
+class AdeudosEncargadoTests(BaseTest):
+    def setUp(self):
+        self.entrar(self.encargado)
+
+    def prestamo_vencido(self, equipo, minutos):
+        p = Prestamo.objects.create(
+            solicitante=self.alumno, estado=Prestamo.ACTIVO, fecha_limite=timezone.now() - timedelta(minutes=minutos))
+        return p, DetallePrestamo.objects.create(prestamo=p, equipo=equipo)
+
+    def test_lista_prestamos_vencidos_y_danos_sin_saldar(self):
+        self.prestamo_vencido(crear_equipo('LAP-1'), 120)
+        equipo = crear_equipo('LAP-2')
+        prestamo = Prestamo.objects.create(
+            solicitante=self.otro, estado=Prestamo.DEVUELTO, fecha_limite=timezone.now())
+        incidencia = Incidencia.objects.create(
+            equipo=equipo, prestamo=prestamo, usuario_registro=self.encargado,
+            tipo=Incidencia.DANO, descripcion='Pantalla rota')
+        r = self.client.get(reverse('enc-adeu'))
+        self.assertEqual(r.context['total_adeudos'], 2)
+        self.assertEqual(r.context['solicitantes_con_adeudo'], 2)
+        self.assertContains(r, 'Pantalla rota')
+        self.assertContains(r, reverse('enc-incidente-resolver', args=[incidencia.pk]))
+
+    def test_saldar_desde_adeudos_vuelve_a_adeudos(self):
+        equipo = crear_equipo('LAP-1')
+        prestamo = Prestamo.objects.create(
+            solicitante=self.alumno, estado=Prestamo.DEVUELTO, fecha_limite=timezone.now())
+        incidencia = Incidencia.objects.create(
+            equipo=equipo, prestamo=prestamo, usuario_registro=self.encargado,
+            tipo=Incidencia.PERDIDA, descripcion='No apareció')
+        r = self.client.post(reverse('enc-incidente-resolver', args=[incidencia.pk]),
+                             {'forma_saldo': Incidencia.PAGO, 'next': reverse('enc-adeu')})
+        self.assertRedirects(r, reverse('enc-adeu'))
+        incidencia.refresh_from_db()
+        self.assertTrue(incidencia.adeudo_saldado)
+        self.assertEqual(self.client.get(reverse('enc-adeu')).context['total_adeudos'], 0)
+
+    def test_vencidos_respeta_la_tolerancia(self):
+        self.prestamo_vencido(crear_equipo('LAP-1'), 5)  # dentro de los 10 minutos de tolerancia
+        self.prestamo_vencido(crear_equipo('LAP-2'), 60)
+        r = self.client.get(reverse('enc-ven'))
+        self.assertEqual(r.context['total_vencidos'], 1)
+
+    def test_nuevas_pestanas_cargan_y_exigen_encargado(self):
+        for nombre in ('enc-ven', 'enc-inven', 'enc-adeu', 'enc-historial'):
+            with self.subTest(nombre):
+                self.assertEqual(self.client.get(reverse(nombre)).status_code, 200)
+        self.client.logout()
+        for nombre in ('enc-ven', 'enc-inven', 'enc-adeu', 'enc-historial'):
+            with self.subTest(anonimo=nombre):
+                self.assertEqual(self.client.get(reverse(nombre)).status_code, 302)
+        self.entrar(self.alumno)
+        for nombre in ('enc-ven', 'enc-inven', 'enc-adeu', 'enc-historial'):
+            with self.subTest(alumno=nombre):
+                self.assertRedirects(self.client.get(reverse(nombre)), reverse('index'))
+
+
+class InventarioEncargadoTests(BaseTest):
+    def setUp(self):
+        self.categoria = Categoria.objects.create(nombre='Laptop')
+        self.entrar(self.encargado)
+
+    def test_agrega_un_equipo(self):
+        r = self.client.post(reverse('enc-inven'), {
+            'nombre': 'Dell Latitude', 'codigo_inventario': 'LAP-9', 'categoria': self.categoria.pk}, follow=True)
+        equipo = Equipo.objects.get(codigo_inventario='LAP-9')
+        self.assertEqual((equipo.marca, equipo.modelo), ('Dell', 'Latitude'))
+        self.assertContains(r, 'Equipo agregado')
+
+    def test_codigo_repetido_avisa(self):
+        crear_equipo('LAP-9', self.categoria)
+        r = self.client.post(reverse('enc-inven'), {
+            'nombre': 'HP Probook', 'codigo_inventario': 'LAP-9', 'categoria': self.categoria.pk}, follow=True)
+        self.assertContains(r, 'Ya existe un equipo')
+        self.assertEqual(Equipo.objects.count(), 1)
+
+    def test_el_alumno_no_puede_agregar_equipos(self):
+        self.entrar(self.alumno)
+        self.client.post(reverse('enc-inven'), {
+            'nombre': 'Dell Latitude', 'codigo_inventario': 'LAP-9', 'categoria': self.categoria.pk})
+        self.assertFalse(Equipo.objects.exists())
+
+
+class AdministradorTests(BaseTest):
+    def test_panel_y_bitacora_solo_para_el_administrador(self):
+        for nombre in ('adm-panel', 'adm-bitacora'):
+            with self.subTest(nombre):
+                self.assertEqual(self.client.get(reverse(nombre)).status_code, 302)  # anónimo
+                self.entrar(self.encargado)
+                self.assertRedirects(self.client.get(reverse(nombre)), reverse('index'))
+                self.entrar(self.admin)
+                self.assertEqual(self.client.get(reverse(nombre)).status_code, 200)
+                self.client.logout()
+
+    def test_el_login_de_admin_lleva_al_panel(self):
+        r = self.client.post(reverse('login') + '?tipo=ADMIN', {'username': 'AD01', 'password': 'clave123'})
+        self.assertRedirects(r, reverse('adm-panel'))
+
+    def test_bitacora_filtra_y_pagina_de_50_en_50(self):
+        for n in range(60):
+            Bitacora.objects.create(tipo=Bitacora.OPERACION, usuario=self.encargado, accion=f'Operación {n}')
+        Bitacora.objects.create(tipo=Bitacora.ACCESO, usuario=self.alumno, accion='Inicio de sesión')
+        self.entrar(self.admin)
+        r = self.client.get(reverse('adm-bitacora'))
+        self.assertEqual(len(r.context['pagina']), 50)
+        self.assertEqual(r.context['pagina'].paginator.num_pages, 2)
+        accesos = self.client.get(reverse('adm-bitacora'), {'tipo': 'acceso'})
+        self.assertEqual([x.accion for x in accesos.context['pagina']], ['Inicio de sesión'])
+        por_usuario = self.client.get(reverse('adm-bitacora'), {'usuario': 'A01234'})
+        self.assertEqual(por_usuario.context['pagina'].paginator.count, 1)
+        por_accion = self.client.get(reverse('adm-bitacora'), {'accion': 'Operación 59'})
+        self.assertEqual(por_accion.context['pagina'].paginator.count, 1)
+
+    def test_el_historial_del_encargado_no_muestra_accesos(self):
+        Bitacora.objects.create(tipo=Bitacora.ACCESO, usuario=self.alumno, accion='Inicio de sesión')
+        Bitacora.objects.create(tipo=Bitacora.OPERACION, usuario=self.encargado, accion='Devolución registrada')
+        self.entrar(self.encargado)
+        r = self.client.get(reverse('enc-historial'), {'tipo': 'acceso'})  # el filtro de tipo no se respeta
+        self.assertEqual([x.accion for x in r.context['pagina']], ['Devolución registrada'])
+
+
+class SolicitudReglasTests(BaseTest):
+    """Las reglas de horario se prueban con la hora fijada: 24/11/2026, 10:00 (zona del proyecto)."""
+
+    def setUp(self):
+        self.ahora = timezone.make_aware(datetime(2026, 11, 24, 10, 0))
+        self.laptop = crear_equipo('LAP-1')  # categoría por días
+        horas = Categoria.objects.create(nombre='Proyector', modalidad=Categoria.POR_HORAS)
+        self.proyector = crear_equipo('PRO-1', horas)
+
+    def validar(self, equipo, limite, ahora=None, **extra):
+        with mock.patch('project.services.ahora', return_value=ahora or self.ahora):
+            return services.validar_solicitud(
+                self.alumno, [equipo], limite, extra.pop('motivo_tipo', 'practica'), **extra)
+
+    def error(self, equipo, limite, **kwargs):
+        with self.assertRaises(services.ErrorOperacion) as ctx:
+            self.validar(equipo, limite, **kwargs)
+        return ctx.exception
+
+    def en(self, dia, hora, minuto=0):
+        return timezone.make_aware(datetime(2026, 11, dia, hora, minuto))
+
+    def test_por_horas_acepta_hoy_en_pasos_de_15_minutos(self):
+        self.assertEqual(self.validar(self.proyector, self.en(24, 11, 45)), self.en(24, 11, 45))
+
+    def test_por_horas_rechaza_mas_de_dos_horas(self):
+        self.assertIn('2 horas', str(self.error(self.proyector, self.en(24, 12, 15))))
+
+    def test_por_horas_rechaza_minutos_fuera_del_paso(self):
+        self.assertIn('15 minutos', str(self.error(self.proyector, self.en(24, 11, 10))))
+
+    def test_por_horas_rechaza_otro_dia(self):
+        self.assertIn('mismo día', str(self.error(self.proyector, self.en(25, 9, 0))))
+
+    def test_por_horas_rechaza_fuera_de_horario(self):
+        tarde = self.en(24, 19, 0)
+        self.assertIn('horario', str(self.error(self.proyector, self.en(24, 21, 0), ahora=tarde)))
+        madrugada = self.en(24, 6, 0)
+        self.assertIn('horario', str(self.error(self.proyector, self.en(24, 7, 30), ahora=madrugada)))
+
+    def test_por_dias_se_devuelve_al_cierre_del_dia_elegido(self):
+        self.assertEqual(self.validar(self.laptop, self.en(25, 9, 30)), self.en(25, 20, 0))
+
+    def test_por_dias_no_acepta_hoy_ni_mas_de_siete_dias(self):
+        self.assertIn('mañana', str(self.error(self.laptop, self.en(24, 15, 0))))
+        self.assertIn('7 días', str(self.error(self.laptop, self.ahora + timedelta(days=8))))
+        self.assertEqual(self.validar(self.laptop, self.ahora + timedelta(days=7)).hour, 20)
+
+    def test_no_mezcla_modalidades_ni_pasa_del_maximo(self):
+        with mock.patch('project.services.ahora', return_value=self.ahora):
+            with self.assertRaises(services.ErrorOperacion):
+                services.validar_solicitud(self.alumno, [self.laptop, self.proyector], self.en(25, 9), 'practica')
+            extras = [crear_equipo(f'X-{n}') for n in range(4)]
+            with self.assertRaises(services.ErrorOperacion):
+                services.validar_solicitud(self.alumno, extras, self.en(25, 9), 'practica')
+
+    def test_con_adeudos_no_puede_solicitar(self):
+        vencido = Prestamo.objects.create(
+            solicitante=self.alumno, estado=Prestamo.ACTIVO, fecha_limite=timezone.now() - timedelta(days=2))
+        DetallePrestamo.objects.create(prestamo=vencido, equipo=crear_equipo('LAP-9'))
+        self.assertIn('adeudos', str(self.error(self.laptop, self.en(25, 9))))
+
+    def test_motivo_otro_exige_detalle(self):
+        error = self.error(self.laptop, self.en(25, 9), motivo_tipo=Prestamo.MOTIVO_OTRO, motivo=' ')
+        self.assertEqual(error.campo, 'motivo')
+
+    def test_solicitar_crea_pendiente_con_bitacora(self):
+        with mock.patch('project.services.ahora', return_value=self.ahora):
+            prestamo = services.solicitar_prestamo(self.alumno, [self.laptop], self.en(26, 9), 'tarea')
+        self.assertEqual(prestamo.estado, Prestamo.PENDIENTE)
+        self.assertEqual(prestamo.fecha_limite, self.en(26, 20, 0))
+        self.assertEqual(list(prestamo.equipos.all()), [self.laptop])
+        self.assertTrue(Bitacora.objects.filter(accion='Solicitud de préstamo', id_registro=prestamo.pk).exists())
+
+    def test_equipo_no_disponible_se_rechaza(self):
+        self.laptop.estado = Equipo.PRESTADO
+        self.laptop.save()
+        with mock.patch('project.services.ahora', return_value=self.ahora):
+            with self.assertRaises(services.ErrorOperacion):
+                services.solicitar_prestamo(self.alumno, [self.laptop], self.en(26, 9), 'tarea')
+
+    def test_el_formulario_muestra_el_error_en_el_campo(self):
+        with mock.patch('project.services.ahora', return_value=self.ahora):
+            form = SolicitudPrestamoForm(
+                {'equipos': [self.proyector.pk], 'fecha_limite': '2026-11-24T14:00', 'motivo_tipo': 'tarea'},
+                solicitante=self.alumno)
+            self.assertFalse(form.is_valid())
+        self.assertIn('fecha_limite', form.errors)

@@ -1,1 +1,80 @@
-<h1>ESTO DEBE SER EL ADEUDOs PA, EN PROCESO</h1>
+{% extends 'gestion/base_encargado.html' %}
+{% block title %}Adeudos - Encargado{% endblock %}
+
+{% block layout %}
+<main class="main_dis">
+    {% include 'gestion/encargado/_aside.html' with activo='adeudos' %}
+    <section class="EP-principal">
+        <div class="EP-menus">
+            <h1>Adeudos</h1>
+        </div>
+        {% include 'gestion/_mensajes.html' %}
+        <section class="EP-menus-P">
+            <div class="EP-menus-P1">
+                <div class="EP-menus-btn">
+                    <span>{{ total_adeudos }} adeudo{{ total_adeudos|pluralize }} de {{ solicitantes_con_adeudo }} solicitante{{ solicitantes_con_adeudo|pluralize }}</span>
+                </div>
+                <label class="EP-search">
+                    <input id="buscar-tabla" placeholder="Estudiante, matrícula o equipo" autocomplete="off">
+                </label>
+            </div>
+            <div class="tabla-scroll">
+                <table class="EP-table">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Equipo</th>
+                            <th>Concepto</th>
+                            <th>Desde</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for adeudo in adeudos %}
+                        <tr class="EP-tr-s borde-estado {{ adeudo.clave }}" data-busqueda="{{ adeudo.busqueda }}">
+                            <td class="EP-table-td">
+                                <b>{{ adeudo.solicitante.nombre }}</b>
+                                <small>{{ adeudo.solicitante.identificador }}</small>
+                            </td>
+                            <td class="EP-table-td">
+                                <b>{{ adeudo.equipo.nombre }}</b>
+                                <small>{{ adeudo.equipo.codigo_inventario }}</small>
+                            </td>
+                            <td class="EP-table-td">
+                                <span class="badge-estado estado-vencido">{{ adeudo.concepto }}</span>
+                                {% if adeudo.nota %}<small>{{ adeudo.nota }}</small>{% endif %}
+                            </td>
+                            <td>{{ adeudo.desde|date:"d M H:i" }}</td>
+                            <td>
+                                {% if adeudo.detalle %}
+                                <button type="button" class="btnPrestamo-Nuevo btn-devolver1"
+                                        data-detalle="{{ adeudo.detalle.pk }}"
+                                        data-equipo="{{ adeudo.equipo.nombre }} · {{ adeudo.equipo.codigo_inventario }}"
+                                        data-texto="{{ adeudo.solicitante.nombre }} ({{ adeudo.solicitante.identificador }}) · límite {{ adeudo.desde|date:'d M H:i' }} · con retraso">Devolver</button>
+                                {% else %}
+                                <form method="post" action="{% url 'enc-incidente-resolver' adeudo.incidencia.pk %}" class="form-saldar">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                    <select name="forma_saldo" required aria-label="Forma de saldo">
+                                        <option value="" disabled selected>Saldar con…</option>
+                                        {% for clave, texto in formas_saldo %}
+                                        <option value="{{ clave }}">{{ texto }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btnPrestamo-Nuevo">Saldar</button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">No hay adeudos pendientes.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+</main>
+
+{% include 'gestion/encargado/_modal_devolucion.html' %}
+{% endblock layout %}

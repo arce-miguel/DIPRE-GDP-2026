@@ -17,6 +17,15 @@ USUARIOS = [
     ('e02@demo.local', 'Encargado 02', Rol.ENCARGADO, None, 'e02'),
     ('admin@demo.local', 'Administrador', Rol.ADMINISTRADOR, None, 'admin'),
 ]
+# Alumnos 23210001 a 23210009 y encargados 2101 a 2103, para hacer pruebas
+USUARIOS += [
+    (f'2321000{n}@demo.local', f'Alumno 2321000{n}', Rol.SOLICITANTE, f'2321000{n}', None)
+    for n in range(1, 10)
+]
+USUARIOS += [
+    (f'210{n}@demo.local', f'Encargado 210{n}', Rol.ENCARGADO, None, f'210{n}')
+    for n in range(1, 4)
+]
 
 # (categoría, modalidad, prefijo del código, marca, modelo, cantidad)
 # El nombre que ve el usuario es "marca modelo"; en lo genérico la marca es el tipo (p. ej. "Cable HDMI").

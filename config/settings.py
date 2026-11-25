@@ -10,20 +10,37 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _cargar_env():
+    """Lee BASE_DIR/.env (líneas CLAVE=valor) sin pisar las variables ya definidas en el entorno."""
+    archivo = BASE_DIR / '.env'
+    if not archivo.is_file():
+        return
+    for linea in archivo.read_text(encoding='utf-8').splitlines():
+        linea = linea.strip()
+        if not linea or linea.startswith('#') or '=' not in linea:
+            continue
+        clave, valor = linea.split('=', 1)
+        os.environ.setdefault(clave.strip(), valor.strip().strip("\"'"))
+
+
+_cargar_env()
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k0#jy$n$47@_2&^c!2esw@p0!68v&lc5tcr&yg!%6t)b7=hk)s'
+SECRET_KEY = os.environ.get('SECRET_KEY') or 'django-insecure-solo-para-desarrollo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
 ALLOWED_HOSTS = ['192.168.1.110', 'localhost', '127.0.0.1', '*']
 
@@ -85,22 +102,31 @@ TOLERANCIA_MINUTOS = 10
 SOLICITUD_MAX_EQUIPOS = 3  # equipos por solicitud
 SOLICITUD_MAX_DIAS = 7  # días máximos de préstamo (categorías por días)
 SOLICITUD_MAX_HORAS = 2  # horas máximas de préstamo (categorías por horas)
-HORARIO_SERVICIO = (8, 18)  # hora de apertura y cierre (categorías por horas)
+HORARIO_SERVICIO = (7, 20)  # apertura y cierre (por horas); por días se devuelve al cierre
 
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sistema_prestamos',
-        'USER': 'admin_user',
-        'PASSWORD': 'Dipre123!',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+# MySQL por defecto; con DB_ENGINE=sqlite en el .env se usa un archivo local sin instalar nada
+if os.environ.get('DB_ENGINE', 'mysql').lower() == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'sistema_prestamos'),
+            'USER': os.environ.get('DB_USER', ''),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+        }
+    }
 
 
 # Password validation
@@ -139,12 +165,7 @@ USE_TZ = True
 
 
 
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
+# Email: en desarrollo los correos se imprimen en la consola
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
 STATIC_URL = 'static/'

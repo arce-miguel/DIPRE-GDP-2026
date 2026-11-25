@@ -44,7 +44,7 @@ copy .env.example .env       # en Mac o Linux: cp .env.example .env
 
 # 3. Base de datos
 python manage.py migrate
-python manage.py seed_demo   # datos de ejemplo (opcional)
+python manage.py seed        # datos de ejemplo (opcional)
 
 # 4. Servidor
 python manage.py runserver

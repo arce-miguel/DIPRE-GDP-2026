@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, views_encargado as enc
+from . import views, views_admin as adm, views_encargado as enc
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -24,6 +24,11 @@ urlpatterns = [
     path('encargado/vencidos', enc.enc_vencidos, name='enc-ven'),
     path('encargado/inventario', enc.enc_inventario, name='enc-inven'),
     path('encargado/adeudos', enc.enc_adeudos, name='enc-adeu'),
+    path('encargado/historial', adm.enc_historial, name='enc-historial'),
+
+    # Administrador
+    path('administrador/panel', adm.adm_panel, name='adm-panel'),
+    path('administrador/bitacora', adm.adm_bitacora, name='adm-bitacora'),
 
     # Encargado: acciones sobre la base de datos
     path('encargado/verificar/', enc.enc_verificar, name='enc-verificar'),

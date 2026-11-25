@@ -1170,3 +1170,19 @@
 .EP-tr-s[data-estado="baja"] td:first-child          { border-left: 4px solid #94a3b8; }
 .EP-tr-s[data-estado="extraviado"] td:first-child { border-left: 4px solid #ef4444; }
 .EP-tr-s[data-estado="baja"] td:first-child       { border-left: 4px solid #64748b; }
+/* Adeudos: formulario para saldar un daño o pérdida */
+.form-saldar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.form-saldar select { padding: 6px 8px; border-radius: 6px; max-width: 220px; }
+
+/* Administracion y bitacora */
+.bitacora-filtros { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin-bottom: 12px; }
+.bitacora-filtros label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.bitacora-filtros input, .bitacora-filtros select { padding: 6px 8px; border-radius: 6px; }
+.bitacora-paginas { display: flex; gap: 16px; align-items: center; justify-content: center; margin-top: 12px; }
+.adm-grupos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; width: 100%; }
+.adm-tarjeta { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.adm-tarjeta h2 { margin: 0 0 8px; font-size: 16px; }
+.adm-tarjeta dl { margin: 0; }
+.adm-tarjeta dl div { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #eee; }
+.adm-tarjeta dt { color: #555; }
+.adm-tarjeta dd { margin: 0; font-weight: 700; }

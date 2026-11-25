@@ -26,7 +26,7 @@
             {% if categoria.por_horas %}
             Por horas: hasta {{ max_horas }} h, el mismo día, de {{ apertura }}:00 a {{ cierre }}:00.
             {% else %}
-            Por días: hasta {{ max_dias }} días.
+            Por días: de mañana a {{ max_dias }} días, devolución a las {{ cierre }}:00.
             {% endif %}
             <strong>{{ categoria.disponibles }} de {{ categoria.lista|length }} disponibles.</strong>
         </p>
