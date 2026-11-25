@@ -99,7 +99,7 @@ LOGOUT_REDIRECT_URL = 'index'
 TOLERANCIA_MINUTOS = 10
 
 # Reglas de las solicitudes de préstamo
-SOLICITUD_MAX_EQUIPOS = 3  # equipos por solicitud
+SOLICITUD_MAX_EQUIPOS = 1  # equipos por solicitud (un préstamo = un equipo)
 SOLICITUD_MAX_DIAS = 7  # días máximos de préstamo (categorías por días)
 SOLICITUD_MAX_HORAS = 2  # horas máximas de préstamo (categorías por horas)
 HORARIO_SERVICIO = (7, 20)  # apertura y cierre (por horas); por días se devuelve al cierre

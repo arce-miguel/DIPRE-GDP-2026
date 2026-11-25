@@ -9,7 +9,7 @@
     <header class="panel-header">
         <div>
             <h1>Solicitar equipo</h1>
-            <p>Elige hasta {{ max_equipos }} equipos disponibles y completa los datos de tu solicitud.</p>
+            <p>Elige {% if max_equipos == 1 %}un equipo disponible{% else %}hasta {{ max_equipos }} equipos disponibles{% endif %} y completa los datos de tu solicitud.</p>
         </div>
         <a href="{% url 'panel_solicitante' %}" class="btn-secundario btn-secundario-claro">← Volver a mis préstamos</a>
     </header>
@@ -42,7 +42,9 @@
                 {% endfor %}
             </div>
 
-            <div class="equipos-lista">
+            <p id="contador-equipos" class="campo-ayuda contador-equipos" aria-live="polite"></p>
+
+            <div class="equipos-lista" data-max="{{ max_equipos }}">
                 {% for e in equipos %}
                 <label class="equipo-card{% if not e.disponible %} equipo-no-disponible{% endif %}"
                        data-categoria="{{ e.categoria_id }}"

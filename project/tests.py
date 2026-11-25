@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from unittest import mock
 
-from django.test import TestCase
+from django.conf import settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -574,13 +575,30 @@ class SolicitudReglasTests(BaseTest):
         self.assertIn('7 días', str(self.error(self.laptop, self.ahora + timedelta(days=8))))
         self.assertEqual(self.validar(self.laptop, self.ahora + timedelta(days=7)).hour, 20)
 
-    def test_no_mezcla_modalidades_ni_pasa_del_maximo(self):
+    def test_una_solicitud_es_de_un_solo_equipo(self):
+        self.assertEqual(settings.SOLICITUD_MAX_EQUIPOS, 1)
+        otro = crear_equipo('LAP-2')
+        error = self.error_con_equipos([self.laptop, otro], self.en(25, 9))
+        self.assertEqual(error.campo, 'equipos')
+        self.assertIn('un equipo', str(error))
+
+    @override_settings(SOLICITUD_MAX_EQUIPOS=3)
+    def test_si_se_permiten_varios_no_mezcla_modalidades_ni_pasa_del_maximo(self):
+        self.assertIn('combinar', str(self.error_con_equipos([self.laptop, self.proyector], self.en(25, 9))))
+        extras = [crear_equipo(f'X-{n}') for n in range(4)]
+        self.assertIn('hasta 3', str(self.error_con_equipos(extras, self.en(25, 9))))
+
+    def error_con_equipos(self, equipos, limite):
         with mock.patch('project.services.ahora', return_value=self.ahora):
-            with self.assertRaises(services.ErrorOperacion):
-                services.validar_solicitud(self.alumno, [self.laptop, self.proyector], self.en(25, 9), 'practica')
-            extras = [crear_equipo(f'X-{n}') for n in range(4)]
-            with self.assertRaises(services.ErrorOperacion):
-                services.validar_solicitud(self.alumno, extras, self.en(25, 9), 'practica')
+            with self.assertRaises(services.ErrorOperacion) as ctx:
+                services.validar_solicitud(self.alumno, equipos, limite, 'practica')
+        return ctx.exception
+
+    def test_la_pagina_limita_la_seleccion_a_un_equipo(self):
+        self.entrar(self.alumno)
+        r = self.client.get(reverse('solicitar_equipo'))
+        self.assertContains(r, 'data-max="1"')
+        self.assertContains(r, 'Elige un equipo disponible')
 
     def test_con_adeudos_no_puede_solicitar(self):
         vencido = Prestamo.objects.create(

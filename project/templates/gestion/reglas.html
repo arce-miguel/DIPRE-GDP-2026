@@ -15,8 +15,12 @@
     <section class="panel-card">
         <h2>Solicitudes</h2>
         <ul class="reglas-lista">
+            {% if max_equipos == 1 %}
+            <li>Cada solicitud es de <b>un solo equipo</b>.</li>
+            {% else %}
             <li>Puedes pedir hasta <b>{{ max_equipos }} equipos</b> en una misma solicitud.</li>
             <li>No se mezclan equipos <b>por horas</b> con equipos <b>por días</b> en la misma solicitud.</li>
+            {% endif %}
             <li>Toda solicitud queda <b>pendiente</b> hasta que el encargado la apruebe y te entregue el equipo.</li>
             <li>Si el encargado la rechaza, verás el motivo en <b>Mis préstamos</b>.</li>
         </ul>

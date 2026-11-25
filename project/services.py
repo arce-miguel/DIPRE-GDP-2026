@@ -95,8 +95,10 @@ def validar_solicitud(solicitante, equipos, fecha_limite, motivo_tipo, motivo=''
     if not equipos:
         raise ErrorOperacion('Elige al menos un equipo.', 'equipos')
     if len(equipos) > settings.SOLICITUD_MAX_EQUIPOS:
-        raise ErrorOperacion(
-            f'Puedes solicitar hasta {settings.SOLICITUD_MAX_EQUIPOS} equipos a la vez.', 'equipos')
+        maximo = settings.SOLICITUD_MAX_EQUIPOS
+        mensaje = ('Solo puedes solicitar un equipo por solicitud.' if maximo == 1
+                   else f'Puedes solicitar hasta {maximo} equipos a la vez.')
+        raise ErrorOperacion(mensaje, 'equipos')
     if len({e.por_horas for e in equipos}) > 1:
         raise ErrorOperacion(
             'No puedes combinar equipos por horas con equipos por días en la misma solicitud.', 'equipos')

@@ -243,3 +243,9 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Solicitar equipo: contador y tarjetas bloqueadas al llegar al maximo */
+.contador-equipos { margin: 0 0 12px; }
+.contador-equipos.contador-lleno { color: #1f4fa8; font-weight: 600; }
+.equipo-card.equipo-limite { opacity: 0.5; cursor: not-allowed; }
+.equipo-card.equipo-limite:hover { transform: none; border-color: #d4d9e6; }
