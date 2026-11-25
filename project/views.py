@@ -75,7 +75,7 @@ def login_todos(request):
         identificador = request.POST.get('username', '').strip()
         usuario = authenticate(request, username=identificador, password=request.POST.get('password', ''))
         if usuario is None:
-            error = 'Número de control o contraseña incorrectos.'
+            error = f"{modulo['campo']} o contraseña incorrectos."
             # Nunca se guarda la contraseña, solo qué identificador se intentó y en qué módulo
             registrar(None, 'Intento de acceso fallido', 'usuario', detalle=f'{identificador} · módulo {tipo}',
                       tipo=Bitacora.ACCESO)

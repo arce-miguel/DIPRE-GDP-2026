@@ -51,6 +51,25 @@ document.addEventListener('DOMContentLoaded', () => {
             fila.hidden = !visible;
             if (!visible && fila.classList.contains('detalle')) fila.classList.remove('abierta');
         });
+
+        // Si hay filas pero el filtro las oculta todas, se avisa en vez de dejar la tabla vacía
+        const filas = tbody.querySelectorAll('tr[data-estado]:not(.detalle)');
+        const hayVisibles = Array.from(filas).some((fila) => !fila.hidden);
+        let vacia = tbody.querySelector('tr.fila-vacia');
+        if (filas.length && !hayVisibles) {
+            if (!vacia) {
+                vacia = document.createElement('tr');
+                vacia.className = 'fila-vacia';
+                const celda = document.createElement('td');
+                celda.colSpan = document.querySelectorAll('.EP-table thead th').length || 1;
+                celda.textContent = 'No hay resultados con este filtro.';
+                vacia.appendChild(celda);
+                tbody.appendChild(vacia);
+            }
+            vacia.hidden = false;
+        } else if (vacia) {
+            vacia.hidden = true;
+        }
     }
 
     botones.forEach((btn) => {

@@ -4,8 +4,12 @@
 
 {% block content %}
 <div class="index-wrapper">
+    <div class="index-hero">
+        <h1>Préstamo de equipo</h1>
+        <p>Elige cómo quieres entrar al sistema</p>
+    </div>
     <div class="index-container">
-        
+
         <!-- Espacio Estudiantes -->
         <div class="card estudent">
             <a href="{% url 'login' %}?tipo=estudiante" class="card-link-wrapper"> 
@@ -18,7 +22,7 @@
                     </g>
                 </svg>
 
-                <h3>Iniciar sesion como Estudiante</h3>
+                <h3>Iniciar sesión como Estudiante</h3>
                 <p>Consulta y solicita equipo</p> 
             </a>
         </div>
@@ -34,7 +38,7 @@
                         <path d="M16.5 15h3M16.5 18h3"/>
                     </g>
                 </svg>
-                <h3>Iniciar sesion como Encargado</h3>
+                <h3>Iniciar sesión como Encargado</h3>
                 <p>Entrega, recibe y registra préstamos</p>
             </a>
         </div>
@@ -50,7 +54,7 @@
                         <path d="M8.5 16c.5-2 2-3 3.5-3s3 1 3.5 3"/>
                     </g>
                 </svg>
-                <h3>Iniciar sesion como Administrador</h3>
+                <h3>Iniciar sesión como Administrador</h3>
                 <p>Gestión de usuarios, equipos y reportes</p>
             </a>
         </div>

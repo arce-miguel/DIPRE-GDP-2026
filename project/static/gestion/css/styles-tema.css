@@ -1,0 +1,245 @@
+/* ==========================================================
+   TEMA VISUAL COMPARTIDO.
+   Se carga al final en todas las páginas: define los colores y
+   tamaños comunes, y afina lo que los CSS de cada rol dejaron
+   áspero (logo, foco, tablas, filtros, estados vacíos y móvil).
+   ========================================================== */
+
+:root {
+    --t-fondo: #102945;
+    --t-fondo-oscuro: #0c1f34;
+    --t-superficie: #ebeef3;
+    --t-borde: #d5dbe5;
+    --t-texto: #1b2a3d;
+    --t-texto-suave: #5b6573;
+    --t-acento: #2196f3;
+    --t-turquesa: #7fd6c8;
+    --t-radio: 16px;
+    --t-sombra: 0 8px 24px rgba(4, 12, 24, 0.28);
+    --t-alto-cabecera: 92px;
+}
+
+html { scroll-behavior: smooth; }
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+::selection { background: #2196f340; }
+
+/* ---------- Foco visible (teclado) ---------- */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--t-turquesa);
+    outline-offset: 2px;
+}
+
+/* ---------- Barras de desplazamiento discretas ---------- */
+* { scrollbar-width: thin; scrollbar-color: #9aa8bd transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #9aa8bd; border-radius: 999px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- Cabecera (el logo conserva su aspecto original) ---------- */
+.navbar-custom { background: linear-gradient(180deg, #0f2740 0%, #0c1f34 100%); }
+.ED-wrapper-L p {
+    margin: 0;
+    padding: 6px 14px;
+    font-size: 14px;
+    color: #dbe6f5;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+}
+.btn_menu { display: inline-flex; padding: 6px; border-radius: 10px; transition: background 0.2s; }
+.btn_menu:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* ---------- Barra lateral ---------- */
+.aside-nav { gap: 4px; padding-top: 14px; }
+.aside-nav-select, .aside-nav-otros {
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+}
+.aside-nav .icons { width: 38px; height: 38px; }
+.aside-nav span:not(.aside-aviso) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+@media (min-width: 901px) {
+    aside#menu-lateral { width: 196px; }
+    #menu-lateral.closed { margin-left: -196px; }
+}
+.aside-nav-select { box-shadow: inset 4px 0 0 var(--t-acento); }
+.aside-nav hr { border: 0; border-top: 1px solid var(--t-borde); margin: 6px 0; }
+
+/* ---------- Pantalla de inicio ---------- */
+.index-wrapper { flex-direction: column; gap: 8px; }
+.index-hero { text-align: center; color: #fff; max-width: 700px; margin: 0 auto 4px; }
+.index-hero h1 { font-size: 30px; letter-spacing: 0.01em; }
+.index-hero p { color: #a9b8d6; margin-top: 6px; }
+.card { border: 1px solid rgba(255, 255, 255, 0.06); }
+.card-link-wrapper { padding: 28px 32px; }
+.card:focus-within { outline: 2px solid var(--t-turquesa); outline-offset: 3px; }
+
+/* ---------- Inicio de sesión ---------- */
+.login-card { border-radius: 24px; box-shadow: var(--t-sombra); }
+.login-input-group input { transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; }
+.login-input-group input:focus { border-color: var(--t-acento); box-shadow: 0 0 0 3px #2196f33d; }
+.login-submit-btn-class { margin-top: 8px; }
+.login-submit-btn { width: 100%; font-size: 15px; font-weight: 600; }
+.login-card .aviso { margin-bottom: 16px; font-size: 14px; }
+
+/* ---------- Avisos ---------- */
+.aviso { border-left: 5px solid #adb5bd; line-height: 1.4; }
+.aviso-error { border-left-color: #dc3545; }
+.aviso-success { border-left-color: #198754; }
+.aviso-warning { border-left-color: #e0a800; }
+.aviso1 { border-radius: 12px; }
+
+/* ---------- Paneles del encargado y del administrador ---------- */
+.ED-principal, .EP-principal, .EI-principal {
+    width: 100%;
+    max-width: 1240px;
+    min-width: 0;
+    padding: 0 24px 24px;
+    box-sizing: border-box;
+}
+.EP-menus { padding-top: 24px; gap: 12px; flex-wrap: wrap; }
+.EP-menus h1, .EI-principal h1 { font-size: 30px; line-height: 1.2; }
+.EP-menus-P {
+    height: auto;
+    box-shadow: var(--t-sombra);
+    box-sizing: border-box;
+    gap: 20px;
+}
+.EP-menus-P1 { flex-wrap: wrap; gap: 12px; }
+.EP-menus-btn { flex-wrap: wrap; gap: 8px; }
+.EP-menus-btn-u {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.EP-menus-btn-u b { font-weight: 700; opacity: 0.8; }
+.EP-menus-btn-u:hover:not(.activo) { border-color: var(--t-fondo); background: #fff; }
+.EP-search { transition: border-color 0.2s, box-shadow 0.2s; background: #fff; }
+.EP-search:focus-within { border-color: var(--t-acento); box-shadow: 0 0 0 3px #2196f33d; }
+
+/* Tablas: más aire, cabecera clara y la tabla aprovecha el alto disponible */
+.tabla-scroll {
+    max-height: max(300px, calc(100vh - 430px));
+    border-radius: 12px;
+    background: #fff;
+}
+.EP-table thead th {
+    padding: 12px 16px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #4a5568;
+}
+.EP-tr-s { height: 64px; transition: background 0.15s; }
+.EP-table tbody tr:not(.detalle) td { border-top: 1px solid #edf0f5; }
+.fila-vacia td, .EP-table td[colspan] { text-align: center; color: var(--t-texto-suave); padding: 28px 16px; }
+
+/* Botones del encargado */
+.btnPrestamo-Nuevo, .btn-contactar, .EIn-btn, .btn-devolver {
+    transition: background-color 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.btnPrestamo-Nuevo:hover, .EIn-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(2, 94, 131, 0.35); }
+.btnPrestamo-Nuevo:active, .EIn-btn:active { transform: none; box-shadow: none; }
+
+/* Panel principal: las listas largas se desplazan dentro de su tarjeta */
+.ED-subm, .ED-subm-complete { box-shadow: var(--t-sombra); box-sizing: border-box; min-height: 0; }
+.ED-subm-complete { overflow-y: auto; }
+.ED-menus { min-height: 0; }
+
+/* Administración */
+.adm-tarjeta { box-shadow: var(--t-sombra); border-radius: var(--t-radio); transition: transform 0.2s; }
+.adm-tarjeta:hover { transform: translateY(-2px); }
+.adm-tarjeta dd { color: var(--t-fondo); }
+
+/* ---------- Panel del solicitante ---------- */
+.panel-card { box-shadow: var(--t-sombra); }
+.stat { transition: transform 0.2s; }
+.stat:hover { transform: translateY(-2px); }
+.btn-primary, .btn-secundario { transition: background-color 0.2s, border-color 0.2s, transform 0.15s; }
+.empty {
+    text-align: center;
+    padding: 28px 16px;
+    border: 1px dashed var(--t-borde);
+    border-radius: 12px;
+    background: #f7f9fc;
+}
+.panel-card h2 + .empty { margin-top: 4px; }
+
+/* Solicitar equipo, paso 1: la lista de equipos se desplaza dentro de su tarjeta */
+.equipos-lista {
+    max-height: 440px;
+    overflow-y: auto;
+    padding: 4px 10px 4px 4px;  /* aire para que el hover y el borde de la selección no se recorten */
+    margin-right: -6px;
+    overscroll-behavior: contain;
+}
+
+/* ==========================================================
+   PANTALLAS ANGOSTAS (tablet y celular)
+   ========================================================== */
+@media (max-width: 900px) {
+    /* La barra lateral pasa a ser un panel que se desliza sobre el contenido */
+    aside#menu-lateral {
+        position: fixed;
+        top: var(--t-alto-cabecera);
+        bottom: 0;
+        left: 0;
+        z-index: 50;
+        width: 240px;
+        height: auto;
+        margin-left: 0 !important;
+        overflow-y: auto;
+        transition: transform 0.25s ease-in-out;
+        box-shadow: 8px 0 24px rgba(0, 0, 0, 0.35);
+    }
+    aside#menu-lateral.closed { transform: translateX(-110%); box-shadow: none; }
+    .menu-fondo {
+        position: fixed;
+        inset: var(--t-alto-cabecera) 0 0 0;
+        z-index: 45;
+        background: rgba(5, 12, 24, 0.55);
+    }
+    .menu-fondo[hidden] { display: none; }
+
+    .ED-principal { flex-direction: column; align-items: stretch; }
+    .ED-menus { height: auto; width: 100%; }
+    .ED-subm, .ED-subm-complete { height: auto; max-height: 420px; }
+    .EP-menus-P { padding: 18px; }
+    .panel-wrapper { padding: 20px 14px; }
+}
+
+@media (max-width: 560px) {
+    .navbar-custom { padding: 12px; }
+    .ED-wrapper-L p { display: none; }
+    .ED-principal, .EP-principal, .EI-principal { padding: 0 12px 16px; }
+    .EP-menus h1, .panel-header h1, .index-hero h1 { font-size: 24px; }
+    .EP-search { max-width: none; min-width: 0; width: 100%; }
+    .tabla-scroll { max-height: none; }
+    .equipos-lista { max-height: 380px; }
+    .login-wrapper { padding: 20px 12px; min-height: 70vh; }
+    .login-card { padding: 24px 20px; }
+    .card-link-wrapper { padding: 22px 18px; }
+    .stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stats .stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .stat { padding: 16px; }
+    .stat-num { font-size: 30px; }
+}
+
+/* Pantallas bajas (portátiles): el inicio cabe sin desplazarse */
+@media (max-height: 820px) and (min-width: 561px) {
+    .index-wrapper { padding: 14px 20px; }
+    .index-container { gap: 12px; }
+    .card-link-wrapper { padding: 16px 24px; }
+    .card-icon { height: 46px; }
+    .card h3 { font-size: 18px; margin-bottom: 4px; }
+    .index-hero h1 { font-size: 26px; }
+}
+
+/* Respeta a quien pide menos animación */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
